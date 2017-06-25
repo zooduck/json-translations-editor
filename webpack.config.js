@@ -2,7 +2,6 @@ const PATH = require("path");
 const WEBPACK = require("webpack");
 const HTML_WEBPACK_PLUGIN = require("html-webpack-plugin");
 const EXTRACT_TEXT_PLUGIN = require("extract-text-webpack-plugin");
-const PROJECT_NAME = "jsons-translation-editor";
 
 const GET_NODE_ENV = () => process.env.NODE_ENV.trim()
 
@@ -12,18 +11,21 @@ const EXTRACT_STYLESHEETS = new EXTRACT_TEXT_PLUGIN({
 });
 
 const CONFIG = {
-    entry: {     
-        PROJECT_NAME: ["./src/index.js"]     
+    entry: {
+        "json-translations-editor": ["./src/index.js"]
     },
     output: {
         path: PATH.resolve(__dirname, "dist"),
         filename: "[name].bundle.js"
     },
     module: {
-        rules: [            
+        rules: [
            // (see end of file)
         ]
     },
+    // htmlLoader: {
+    //     attrs: ["img:src", "link:href"]
+    // },
     stats: {
         colors: true
     },
@@ -45,7 +47,7 @@ const CONFIG = {
         new WEBPACK.NamedModulesPlugin(),
         new HTML_WEBPACK_PLUGIN({
           template: "./src/templates/index.html"
-        })   
+        })
     ]
 };
 
@@ -57,7 +59,12 @@ const CONFIG = {
 const TEMPLATES_RULE = {
     test: /\.(html|ejs)$/,
     include: PATH.resolve(__dirname, "src"),
-    loader: "html-loader"
+    use: [{
+        loader: "html-loader",
+        options: {
+            attrs: ["img:src", "a:href"]
+        }
+    }]
 };
 
 // scripts
@@ -101,14 +108,14 @@ const IMAGES_RULE = {
 const SCSS_RULE_PROD = { // styles extracted to .css file
     test: /\.scss$/,
     use: EXTRACT_STYLESHEETS.extract({
-        fallback: "style-loader",                  
+        fallback: "style-loader",
         use: [
             {
                 loader: "css-loader",
                 options: { importLoaders: 1 }
             },
             "postcss-loader",
-            "sass-loader"           
+            "sass-loader"
         ]
     })
 };
@@ -121,12 +128,12 @@ const SCSS_RULE_DEV = { // styles stored in JS
 CONFIG.module.rules.push(TEMPLATES_RULE, SCRIPTS_RULE, FONTS_RULE, IMAGES_RULE);
 
 if (GET_NODE_ENV() === "production") {
-    // production   
-    CONFIG.module.rules.push(SCSS_RULE_PROD);   
+    // production
+    CONFIG.module.rules.push(SCSS_RULE_PROD);
     CONFIG.plugins.push(new WEBPACK.optimize.UglifyJsPlugin()); // minify
 } else {
-    // development   
-    CONFIG.module.rules.push(SCSS_RULE_DEV);   
+    // development
+    CONFIG.module.rules.push(SCSS_RULE_DEV);
 }
 
 module.exports = CONFIG;
