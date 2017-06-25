@@ -1,13 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="author" content="zooduck">
-		<title>json-translations-editor by zooduck</title>
-	</head>
-	<body>
-		<desc>
-			<h1>Objective: Create an editable translations table from an imported AngularJS translations JSON file, which can saved and downloaded without API calls.</h1>
-		</desc>
-	</body>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="zooduck">
+        <title>json-translations-editor by zooduck</title>
+    </head>
+    <body>
+       
+    <img src="../img/example.jpg">
+        <container class="container">
+
+             <desc class="desc">
+                <h1>Objective: Create an editable translations table from an imported AngularJS translations JSON file, which can saved and downloaded without API calls.</h1>
+            </desc>
+
+            <div class="row">
+                <div class="col ctrls">
+                    <input id="file" type="file" hidden>
+                    <label for="file"><i class="ion-md-add"></i></label>
+                    <a id="download" download="translations.json" href="../img/example.jpg"><i class="ion-md-cloud-download"></i></a>                  
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <table>
+                        <tr>
+                            <th>KEY</th>
+                            <th>EN</th>
+                            <th>TRANSLATION</th>
+                        </tr>
+
+                        <tr>
+                            <td>CORE.ALERTS.GENERIC_ERROR</td>
+                            <td>We are sorry but something went wrong.</td>
+                            <td>
+                                <textarea rows="1" onfocus="this.parentNode.parentNode.classList.add('edit-in-progress')" onblur="this.parentNode.parentNode.classList.remove('edit-in-progress')"></textarea>
+                            </td>
+                        </tr>
+                         <tr>
+                            <td>CORE.ALERTS.GENERIC_ERROR</td>
+                            <td>We are sorry but something went wrong.</td>
+                            <td>
+                                <textarea rows="1" onfocus="this.parentNode.parentNode.classList.add('edit-in-progress')" onblur="this.parentNode.parentNode.classList.remove('edit-in-progress')"></textarea>
+                            </td>
+                        </tr>
+                         <tr>
+                            <td>CORE.ALERTS.GENERIC_ERROR</td>
+                            <td>We are sorry but something went wrong.</td>
+                            <td>
+                                 <textarea rows="1" onfocus="this.parentNode.parentNode.classList.add('edit-in-progress')" onblur="this.parentNode.parentNode.classList.remove('edit-in-progress')"></textarea>
+                            </td>
+                        </tr>
+                         <tr>
+                            <td>CORE.ALERTS.GENERIC_ERROR</td>
+                            <td>We are sorry but something went wrong.</td>
+                            <td>
+                                <textarea rows="1" onfocus="this.parentNode.parentNode.classList.add('edit-in-progress')" onblur="this.parentNode.parentNode.classList.remove('edit-in-progress')"></textarea>
+                            </td>
+                        </tr>
+                         <tr>
+                            <td>CORE.ALERTS.GENERIC_ERROR</td>
+                            <td>We are sorry but something went wrong.</td>
+                            <td>
+                                 <textarea rows="1" onfocus="this.parentNode.parentNode.classList.add('edit-in-progress')" onblur="this.parentNode.parentNode.classList.remove('edit-in-progress')"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </container>
+    </body>
 </html>

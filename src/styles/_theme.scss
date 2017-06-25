@@ -3,14 +3,81 @@ body {
 	font: $font-weight-base $font-size-base $font-family-base;
 	color: $color-base;
 }
-ul {
-	background: #ccc;
-	padding: 20px;
-	list-style-type: none;
-	li {
-		margin-left: 25px;
+
+.desc, desc {
+	display: block;
+	margin: auto;
+	padding: 10px;
+	width: 100%;
+	// background: cornflowerblue;
+	// color: #fff;
+	color: #555;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	
+	tr {	
+
+		&.edit-in-progress {		
+			outline: solid 3px cornflowerblue;
+
+			td:nth-of-type(1) {
+				color: cornflowerblue;
+			}
+
+			td {
+				border-top-color: red;
+			}
+		}		
+
+		th {
+			background: #eee;			
+			padding: 5px;			
+			color: #555;
+			height: 50px;
+		}
+		td {
+			padding: 5px;			
+			width: 200px;
+			color: #555;
+
+			&:nth-of-type(1) {
+				background: rgba(255, 248, 220, 0.5);
+				color: rgb(205, 133, 63);
+				color: #555;				
+			}
+
+			&:nth-of-type(3) {
+				max-width: 300px;
+				min-width: 300px;
+			}
+		}
+	}
+	
+	textarea {
+		max-width: 100%;
+		min-width: 100%;
+		background: rgb(238, 244, 249);
+		font-size: 1.1em;
+		font-family: $font-family-base;
+		outline: none;
+		border: solid 1px #fff;
 		padding: 5px;
-		background: #eee;
-		font-size: 2em;
+
+		&:focus {
+			outline: none;
+			border: solid 1px #ccc;
+			background: #fff;
+		}
+	}
+}
+
+.ctrls {
+	float: right;
+	i {
+		padding: 10px;
+		cursor: pointer;
 	}
 }

@@ -1,2 +1,13 @@
 @import "../../node_modules/font-awesome/scss/font-awesome";
 @import "../../node_modules/ionicons/dist/scss/ionicons";
+
+i {
+	&.ion, &.fa {
+		font-size: 2em;
+		color: #555;
+
+		&:hover {
+			color: lighten(#555, 25%);
+		}
+	}
+}
