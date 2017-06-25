@@ -23,9 +23,6 @@ const CONFIG = {
            // (see end of file)
         ]
     },
-    // htmlLoader: {
-    //     attrs: ["img:src", "link:href"]
-    // },
     stats: {
         colors: true
     },
