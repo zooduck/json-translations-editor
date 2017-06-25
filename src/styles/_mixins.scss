@@ -1,0 +1,154 @@
+// |||||||||||||
+// @mixin placeholder
+// params: styles (optional list of style declarations in parentheses separated by spaces)
+// |||||||||||||
+//@ ===============================================================================
+//@ input[type=text].tomato-placeholder {
+//@     @include placeholder((color magenta) (font-family impact));
+//@ }
+//@ ===============================================================================
+$placeholder-vendor-prefixes: '::placeholder', '::-webkit-input-placeholder' '::-moz-placeholder' ':-ms-input-placeholder' ':-moz-placeholder';
+@mixin placeholder($list){
+    @each $prefix in $placeholder-vendor-prefixes{
+        &#{$prefix}{
+            $single-list: true;
+            @if length($list) >= 2 {
+                @each $style in $list {
+                    @if length($style) > 1 {
+                        $single-list: false;
+                        #{nth($style, 1)}:#{nth($style, 2)};
+                    }
+                }
+            }
+            @if $single-list == true {
+                #{nth($list, 1)}:#{nth($list, 2)};
+            }
+        }
+    }
+}
+//||||||||||||
+// @mixin inputFancy
+// params: font-family (required), icon (required), background-color (optional), color (optional)
+// |||||||||||
+//@ .input-fancy {
+//@     &.search {
+//@         label {
+//@             @include inputFancy_Label(Ionicons, '\f375');
+//@         }
+//@         a {
+//@             @include inputFancy_A(Ionicons, '\f2c0');
+//@         }
+//@     }
+//@     &.person-add {
+//@         label {
+//@             @include inputFancy_Label(Ionicons, '\f344', coral, #222);
+//@         }
+//@         a {
+//@             @include inputFancy_A(Ionicons, '\f2c0', black, gray);
+//@         }
+//@     }
+//@ }
+.input-fancy {
+    display: inline-block;
+    position: relative;
+    // text-align: center;
+
+    input {
+        position: relative;
+        display: block;
+        padding: 30px 65px 10px 65px;
+        font-size: inherit;
+
+        &:focus {
+            + .placeholder {
+                left: 1px;
+                top: 1px;
+                opacity: 1;
+                transform: scale(0.6);
+                transition: all .2s linear;
+            }
+            @each $prefix in $placeholder-vendor-prefixes {
+                &#{$prefix} {
+                    opacity: 0;
+                }
+            }
+        }
+    }
+
+    // placeholder label
+    .placeholder {
+        position: absolute;
+        top: 28px;
+        left: 58px;
+        color: #555;
+        padding: 2px 10px;
+        z-index: 1;
+        font-size: inherit;
+        font-family: inherit;
+        pointer-events: none;
+        transform-origin: top left;
+        transform: scale(1);
+        opacity: 0;
+    }
+
+    // left icon (s/b passive)
+    label {
+        &::before {
+            position: absolute;
+            left: 7px;
+            top: 27px;
+            z-index: 1;
+            padding: 5px 10px;
+            pointer-events: none;
+
+            // user configurable
+            content: "";
+            font-family: inherit;
+            background: inherit;
+            color: inherit;
+        }
+    }
+
+    // right icon (s/b interactive)
+    a {
+        position: absolute;
+        right: 0;
+        top: 20px;
+        &::before {
+            position: absolute;
+            right: 7px;
+            top: 7px;
+            z-index: 1;
+            padding: 5px 10px;
+            cursor: pointer;
+
+            // user configurable
+            content: "";
+            font-family: inherit;
+            background: inherit;
+            color: inherit;
+        }
+    }
+}
+
+@mixin inputFancy_Label($font-family: 'inherit', $icon: '', $background-color: 'inherit', $color: #000) {
+    &::before {
+        font-family: #{$font-family};
+        content: '#{$icon}';
+        background-color: #{$background-color};
+        color: #{$color};
+    }
+}
+@mixin inputFancy_A($font-family: 'inherit', $icon: '', $background-color: 'inherit', $color: #000) {
+    &::before {
+        font-family: #{$font-family};
+        content: '#{$icon}';
+        background-color: #{$background-color};
+        color: #{$color};
+    }
+    &:hover {
+        &::before {
+            color: lighten($color, 25%);
+        }
+    }
+}

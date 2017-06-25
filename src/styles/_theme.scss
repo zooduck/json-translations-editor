@@ -1,0 +1,16 @@
+body {
+	background-color: $background-color-base;
+	font: $font-weight-base $font-size-base $font-family-base;
+	color: $color-base;
+}
+ul {
+	background: #ccc;
+	padding: 20px;
+	list-style-type: none;
+	li {
+		margin-left: 25px;
+		padding: 5px;
+		background: #eee;
+		font-size: 2em;
+	}
+}
