@@ -6,15 +6,81 @@
         <title>json-translations-editor by zooduck</title>
     </head>
     <body>
+
+        <alert id="alertBar"><h2></h2></alert>
        
-    <img src="../img/example.jpg">
-        <container class="container">
+        <div class="super-container">
 
-             <desc class="desc">
-                <h1>Objective: Create an editable translations table from an imported AngularJS translations JSON file, which can saved and downloaded without API calls.</h1>
-            </desc>
+             <div class="header">
+                <h1 class="icon">JSON Translations Editor</h1>
+            </div>
 
-            <div class="row">
+
+            <!-- JSON file thumbnail / dropzone -->
+            <div class="container-flex column-reverse">
+                <div id="thumbnailFile" class="thumbnail-file">
+                    <h4># no file</h4>
+                   <!--  <div class="icon expand-ctrl"></div> -->
+                    <pre></pre>
+                </div>
+                <div class="progress" id="progress">
+                    <div class="before">0%</div>
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- ctrls -->
+            <div class="container-flex break">
+                 <div class="ctrls">
+                    <input id="file" type="file" hidden>
+                    <label for="file"><i class="ion-md-add"></i></label>
+                    <a id="download" download="translations.json" href="../img/example.jpg"><i class="ion-md-download"></i></a>                  
+                </div>
+            </div>
+
+            <!-- translations table -->
+            <div id="translationsTable">
+                 <div class="container-flex break">
+                    <div class="th">KEY</div>
+                    <div class="th">EN</div>
+                    <div class="th">TRANSLATION</div>
+                </div>
+            </div>
+
+            <!-- templates -->
+            <div id="translationsTableRow_TEMPLATE" class="container-flex tr shutter-in template">
+                <div class="td">CORE.ALERTS.GENERIC_ERROR</div>
+                <div class="td">We are sorry but there seems to be a problem.</div>
+                <div class="td">
+                     <textarea rows="1" placeholder="..."></textarea>    
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+            <div class="row" style="display: none">
                 <div class="col ctrls">
                     <input id="file" type="file" hidden>
                     <label for="file"><i class="ion-md-add"></i></label>
@@ -23,16 +89,19 @@
             </div>
 
 
-            <div class="row">
+
+
+
+            <div class="row" style="display: none">
                 <div class="col-xs-12">
-                    <table>
+                    <table id="translationsTable">
                         <tr>
                             <th>KEY</th>
                             <th>EN</th>
                             <th>TRANSLATION</th>
                         </tr>
 
-                        <tr>
+                        <tr class="shutter-in">
                             <td>CORE.ALERTS.GENERIC_ERROR</td>
                             <td>We are sorry but something went wrong.</td>
                             <td>
@@ -69,7 +138,13 @@
                         </tr>
                     </table>
                 </div>
-            </div>
-        </container>
+            </div> -->
+
+
+
+
+
+
+        </div> <!-- .super-container -->
     </body>
 </html>

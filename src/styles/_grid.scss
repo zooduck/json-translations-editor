@@ -18,10 +18,11 @@ body {
   transform: scale(1);
 }
 
-container, .container {
-  display: table;
+.super-container {
+  // display: table;
   margin-left: auto;
   margin-right: auto;
+  padding: 0 10px;
 
   @media(max-width: 1024px) {
     width: 100%;
