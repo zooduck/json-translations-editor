@@ -16,25 +16,64 @@
             </div>
 
 
+
+
             <!-- JSON file thumbnail / dropzone -->
-            <div class="container-flex column-reverse">
+<!--             <div class="container-flex column-reverse">
                 <div id="thumbnailFile" class="thumbnail-file">
                     <h4># no file</h4>
-                   <!--  <div class="icon expand-ctrl"></div> -->
-                    <pre></pre>
                 </div>
                 <div class="progress" id="progress">
                     <div class="before">0%</div>
                     <div class="progress-bar"></div>
                 </div>
+            </div> -->
+
+
+
+            <div class="container-flex">
+                 <div class="progress" id="progress">
+                    <div class="before">0%</div>
+                    <div class="progress-bar"></div>
+                </div>
             </div>
+
+            <div class="container-flex">
+               
+               <!-- <div id="thumbnailFile" class="thumbnail-file print" style="display:none">
+                    <h4># no file</h4>                   
+                    <pre></pre>
+                </div> -->
+
+                <div class="printer">
+                    <div class="parts"></div>
+                    <div class="parts"></div>
+                    <div class="parts"></div>
+                     <div id="thumbnailFile" class="paper">
+                        <h4></h4>                   
+                        <pre></pre>
+                    </div>
+                </div>
+
+                  <div id="translationsConsole" class="console">                   
+                    <pre></pre>
+                    <pre></pre>
+                </div>
+               
+            </div>
+
+
 
             <!-- ctrls -->
             <div class="container-flex break">
                  <div class="ctrls">
                     <input id="file" type="file" hidden>
-                    <label for="file"><i class="ion-md-add"></i></label>
-                    <a id="download" download="translations.json" href="../img/example.jpg"><i class="ion-md-download"></i></a>                  
+                    <label for="file">
+                        <i class="ion-md-add"></i>
+                    </label>
+                    <a id="download" download="translations.json" href="../img/example.jpg">
+                        <i class="fa fa-save"></i>
+                    </a> 
                 </div>
             </div>
 

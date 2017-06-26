@@ -5,6 +5,7 @@ const progress = document.getElementById("progress");
 const translations_table = document.getElementById("translationsTable");
 const translations_table_row_TEMPLATE = document.getElementById("translationsTableRow_TEMPLATE");
 const alert_bar = document.getElementById("alertBar");
+const translations_console = document.getElementById("translationsConsole");
 
 function textShuffle(txt) {
 	let chars = txt.substr(0, 1000).split("");
@@ -44,6 +45,32 @@ function emptyTranslationsTable () {
 		translations_table.removeChild(child);
 	}
 }
+const translationsService = (function(){
+	let translations = {}
+	return function () {
+		return {
+			update: (e) => {
+				let key = e.target.getAttribute("key");
+				let val = e.target.value;
+				if (val !== "") {
+					translations[key] = val;
+				} else {
+					delete translations[key];
+				}				
+				return translations;
+			},
+			getTranslations: () => {
+				return translations;
+			},
+			generateJSON: () => {
+				return JSON.stringify(flat.unflatten(translations), null, 4);
+			},
+			init: (e) => {
+				translations = {}
+			}
+		}
+	}
+})();
 function buildTranslationsTable (jsonData) {
 	let obj = JSON.parse(jsonData);
 	obj = flat(obj); // flatten
@@ -69,11 +96,12 @@ function buildTranslationsTable (jsonData) {
 				row.querySelectorAll(".td")[1].innerHTML += ` (${commonVal})`;
 			}
 
+			row.querySelector("textarea").setAttribute("key", key);
 			row.querySelector("textarea").addEventListener("keydown", (e) => {
 				let key = e.keyCode || e.charCode;
 				if (key === 13) {
 					e.preventDefault();
-				}
+				}				
 			});
 			row.querySelector("textarea").addEventListener("blur", (e) => {
 				let key = e.keyCode || e.charCode;
@@ -85,6 +113,18 @@ function buildTranslationsTable (jsonData) {
 				} else {
 					e.target.parentNode.previousElementSibling.classList.remove("line-through");
 				}
+				
+				translationsService().update(e);
+				
+				// let translations = translationsService().getTranslations();
+
+				// let arr = [];
+				// for (let key in translations) {
+				// 	arr.push(`${key}:${translations[key]}`);
+				// }
+				// translationsConsoleService().clear(1);
+				// translationsConsoleService().log(arr, {delay: 0, pause: 0, pre: translations_console.querySelectorAll("pre")[1]});
+				// console.log(translationsService().getTranslations());				
 			});
 
 			addRow(row, delay);
@@ -93,10 +133,48 @@ function buildTranslationsTable (jsonData) {
 			console.log(delay);
 	}
 }
+function translationsConsoleService () {
+	return {
+		log: (msgArray = null, options = {delay: 50, pause: 1000, pre: translations_console.querySelector("pre")}) => {
+			translations_console.classList.remove("data-analysis-mode");
+			console.log(options);
+			let messages = msgArray || [
+				"Ready!",
+				"You can now edit translations in the table below."
+			];
+			let delay = 0;		
+			let pause = options.pause || 0;
+			for (let msg of Array.from(messages)) {
+				let chars = msg.split("");
+				if (msg !== "Ready!") {
+					chars.unshift("\n\n");
+				}		
+				for (let char of chars) {
+					setTimeout(function(){
+						options.pre.innerHTML += char;
+					}, delay);
+					delay += options.delay || 0;
+				}
+				delay += pause;
+			}
+		},
+		clear: (preIndex = 0) => {
+			translations_console.querySelectorAll("pre")[preIndex].innerHTML = "";
+		}
+	}	
+}
 function createThumbnailTextFile (textData, fileName) {
-	thumbnail_file.classList.remove("json-parsed", "expand");
+	// thumbnail_file.classList.remove("json-parsed", "expand");
+
+	thumbnail_file.classList.remove("print");
+
+	translations_console.classList.add("data-analysis-mode");
+
+	
 	let h4 = thumbnail_file.querySelector("h4");
 	let pre = thumbnail_file.querySelector("pre");
+	let console_pre = translations_console.querySelector("pre");
+	
 	h4.innerHTML = `# ${fileName}`;
 	let delay = 0;
 	let delayAdds = [];
@@ -109,16 +187,21 @@ function createThumbnailTextFile (textData, fileName) {
 	}
 	for (let i = 0; i < iterations; i++) {
 		let shuffledText = textShuffle(textData);
-		applyShuffledText(shuffledText, pre, delay, totalDelay);
+		applyShuffledText(shuffledText, console_pre, delay, totalDelay);
 		delay += delayAdds.pop();
 	}
 
 	setTimeout(() => {
-		thumbnail_file.classList.add("json-parsed");
+		// thumbnail_file.classList.add("json-parsed");
+		thumbnail_file.classList.add("print");
 	}, totalDelay);
 
 	setTimeout(function(){
 		pre.innerHTML = textData;
+		//console_pre.innerHTML = "Ready!\n\nThe JSON file you uploaded is displayed on the left.\n\nEdit translations in the table below.";
+		translationsConsoleService().clear();
+		translationsConsoleService().log();
+		
 		setProgress("100%");
 		// thumbnail_file.classList.add("json-parsed");
 		buildTranslationsTable(textData);
@@ -208,5 +291,29 @@ export default {
 	},
 	thumbnailFileExpand(e) {
 		e.target.parentNode.classList.toggle("expand");
+	},
+	saveTranslationsToJSON () {
+
+		let json = translationsService().generateJSON();
+		console.log(json);
+
+		// let translations = flat.unflatten(translationsService().getTranslations());
+		// let translationsJson = JSON.stringify(translations, null, 4);
+
+		// console.log(translationsJson);
+		//console.log(translationsService().getTranslations());
 	}
+	// toggleConsoleView(e) {
+	// 	translations_console.classList.toggle("open");
+	// },
+	// translationService() {
+	// 	return {
+	// 		update: (e) => {
+	// 			console.log(e.target.value);				
+	// 		},
+	// 		reset: () => {
+
+	// 		}
+	// 	}		
+	// }
 }

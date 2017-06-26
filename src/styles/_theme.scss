@@ -12,17 +12,26 @@ body {
 	color: #555;
 	text-align: center;
 
-	h1:before {
-		content: "\f227";
-		font-family: Ionicons;
-		color: indianred;
+	// h1:before {
+	// 	content: "\f227";
+	// 	font-family: Ionicons;
+	// 	color: indianred;
+	// }
+
+	h1 {
+		display: inline-block;
+		text-align: right;
+		// background: #eee;
+		// padding: 10px;
+
 	}
 
 	h1:after {
 		display: block;
-		content: "by Bookingbug (c) 2017";
+		content: "by Bookingbug";
 		font-size: 14px;
 		font-weight: normal;
+		// margin-left: calc(100% - 100px);
 	}
 }
 
@@ -96,10 +105,13 @@ body {
 
 .thumbnail-file {
 	position: relative;
+	margin: auto;
+	margin-top: 0px;
 	flex-grow: 1;
-	margin-top: 10px;
-	width: 380px;
+	// margin-top: 10px;
+	// width: 380px;
 	// height: 300px;
+	max-width: 250px;
 	background: #fff;
 	padding: 10px;
 	border: solid 1px transparent;
@@ -107,6 +119,11 @@ body {
 
 	background: $monitor-black;
 	color: $monitor-green;
+
+	background: #fff;
+	color: #555;
+	border: solid 1px black;
+
 
 	pre {
 		height: 210px;
@@ -148,9 +165,172 @@ body {
 
 }
 
+.printer {
+	flex-grow: 1;
+	width: auto;
+	max-width: 200px;
+	min-width: 200px;
+	max-height: 362px;
+
+	perspective: 200px;
+	perspective-origin: bottom;
+
+	.parts {
+		position: relative;
+		margin: auto;
+		z-index: 1;
+		background: $monitor-black;
+		background: #fff;
+		border: solid 3px #fff;
+		background: #ccc;
+		
+		&:nth-of-type(1) {			
+			width: calc(100% - 35px);
+			height: 30px;
+			border-bottom-width: 0;
+
+			&:after {
+				font-family: Ionicons;
+				content: "\f32a";
+				position: absolute;
+				right: 70px;
+				top: 0;
+				font-size: 1.5em;
+				color: #fff;
+
+				// padding: 1px 3px;
+				// border: solid 1px #fff;
+				// border-bottom-width: 0;
+				// border-top-width: 0;
+			}			
+		}
+		&:nth-of-type(2) {			
+			width: 100%;
+			height: 50px;
+			// border-bottom-width: 0;
+			// border: solid 0 #fff;
+			// border-top-width: 3px;
+			border-radius: 10px 10px 0 0;
+			border-bottom-width: 0;
+
+			&:before {
+				font-family: Ionicons;
+				// content: "\f31a";
+				// content: "\f19e";
+				content: "\f30f";
+				// content: "\f33f";
+				color: #fff;
+				position: absolute;
+				top: 5px;
+				left: 8px;
+				font-size: 2em;
+			}
+
+			&:after {
+				font-family: Ionicons;
+				content: "\f359";
+				// content: "\f19e";
+				// content: "\f30f";
+				color: #fff;
+				position: absolute;
+				top: 5px;
+				right: 6px;
+				font-size: 1em;
+			}
+		}
+		&:nth-of-type(3) {
+			z-index: 0;			
+			width: 100%;
+			height: 40px;
+			border-top-width: 0;
+			background: #ddd;
+		}
+	}
+
+	.paper {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		width: calc(100% - 40px);
+		margin: auto;
+		margin-top: 0px;
+		transform: translateY(-250px) rotateX(5deg);
+		background: #fff;
+		border: solid 1px #ccc;
+		border-top-width: 0;
+		padding: 10px;
+		padding-top: 0;
+
+		h4 {
+			border-bottom: solid 2px;
+			padding-bottom: 2px;
+		}
+
+		pre {
+			height: 150px;
+			min-height: 150px;			
+			overflow: hidden;
+			font-size: 10px;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
+	}
+	
+}
+
+.console {
+	position: relative;
+	max-height: 362px;
+	overflow: hidden;
+	border: solid 0 $monitor-black;
+	border-bottom-width: 10px;
+	background: red;
+	flex-grow: 2;
+	background: $monitor-black;
+	color: $monitor-green;
+	margin-left: 10px;
+	padding: 10px;
+	user-select: none;
+	// cursor: pointer;
+
+	// &.open{
+	// 	max-height: none;
+	// }
+
+	&.data-analysis-mode {
+		pre {
+			&:after {
+				content: "";
+			}
+		}
+	}
+
+	pre {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+
+		&:first-of-type {
+			&:after {
+				font-family: Ionicons;
+				content: "\f368";			
+				animation: blink 1s infinite;
+				position: relative;
+				top: 5px;
+				left: 0px;
+				color: #fff;
+			}
+		}
+
+	}
+
+}
+
 .progress {
 	flex-grow: 1;
 	// margin-left: 20px;
+	margin-bottom: 20px;
+	max-width: 200px;
+	border: solid 1px #222;
 	position: relative;
 	width: 380px;
 	height: 30px;
@@ -171,7 +351,7 @@ body {
 	}
 }
 #translationsTable {
-	height: 350px;
+	height: 300px;
 	overflow: auto;
 	// background: $monitor-black;
 	// padding: 10px;
@@ -180,7 +360,9 @@ body {
 .container-flex {
 	display: flex;
 	overflow: hidden;
-	align-items: center;
+	// align-items: center;
+
+	// margin-top: 10px;
 
 	&.column-reverse {
 		flex-direction: column-reverse;
@@ -191,6 +373,7 @@ body {
 	}
 
 	&.tr {
+		align-items: center;
 		transform-origin: top;
 		// background: $monitor-black;
 		color: #fff;
@@ -260,7 +443,7 @@ body {
 				border-color: #222;
 			}
 
-			@include placeholder((color $monitor-green));
+			@include placeholder((color #222));
 		}
 
 		&:nth-of-type(1) {
