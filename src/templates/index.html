@@ -12,7 +12,7 @@
         <div class="super-container">
 
              <div class="header">
-                <h1 class="icon">JSON Translations Editor</h1>
+                <h1>"JSON": "Translations Editor"</h1>
             </div>
 
 
@@ -38,7 +38,7 @@
                 </div>
             </div> -->
 
-            <div class="container-flex">
+            <div class="container-flex justify-content-center" style="display:none">
                
                <!-- <div id="thumbnailFile" class="thumbnail-file print" style="display:none">
                     <h4># no file</h4>                   
@@ -73,25 +73,39 @@
 
 
             <!-- ctrls -->
-            <div class="container-flex break">
-                 <div class="ctrls">
-                    <input id="file" type="file" hidden>
-                    <label for="file">
-                        <i class="ion-md-add"></i>
-                    </label>
-                    <a id="download" download="translations.json" href="../img/example.jpg">
-                        <i class="fa fa-save"></i>
-                    </a> 
+             <div class="ctrls container-flex break">
+                <!-- upload file -->
+                <input id="file" type="file" hidden>
+                <label for="file">
+                    <i class="ion-md-add"></i>
+                </label>
+                <!-- save file -->
+                <a id="download" download="translations.json" href="../img/example.jpg">
+                    <i class="fa fa-save"></i>
+                </a>
+                <!-- file data -->
+                <div id="fileName"></div>
+                <!-- search table -->
+                <input type="text" placeholder="Search...">
+            </div>
+
+             <!-- malenky file preview -->
+            <div class="file-container">
+                <div class="paper">
+                    <h4 id="paperTitle"></h4>
+                    <pre id="paperContent"></pre>
                 </div>
             </div>
 
+
             <!-- translations table -->
             <div id="translationsTable">
-                 <div class="container-flex break">
+                 <div class="container-flex break table-headers">
                     <div class="th">KEY</div>
                     <div class="th">EN</div>
                     <div class="th">TRANSLATION</div>
                 </div>
+                <div class="table-rows"></div>
             </div>
 
             <!-- templates -->

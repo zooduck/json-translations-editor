@@ -1,6 +1,6 @@
 @keyframes shutterIn {
 	from {
-		opacity: 0;
+		opacity: 1;
 		transform: rotateX(90deg) translate(-100%);
 		// transform: translate(-100%);
 	}
@@ -155,3 +155,55 @@
 	animation: push .5s;
 	transform-origin: top;
 }
+
+// @keyframes fileAdd {
+// 	0% {
+// 		transform: translateY(0);
+// 	}
+// 	70% {
+// 		transform: translateY(-50px);
+// 	}
+// 	100% {
+// 		transform: translateY(0);
+// 	}
+// }
+
+// .file-add {
+// 	animation: fileAdd 5s;
+// }
+
+@keyframes fileAdd {
+	0% {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	15% {
+		transform: translateX(280px);
+	}
+	30% {
+		transform: translateX(0);
+	}
+	// 50% {
+	// 	transform: translateX(280px);
+	// }
+	85% {
+		transform: translateX(0);
+	}
+	100% {
+		opacity: 1;
+		transform: translateX(280px);
+	}
+}
+
+.file-add {
+	animation: fileAdd 3s;
+}
+
+// @keyframes fileShow {
+// 	0% {
+// 		transform: translateX(0);
+// 	}	
+// 	100% {
+// 		transform: translateX(-250px);
+// 	}
+// }

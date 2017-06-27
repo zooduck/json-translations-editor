@@ -6,11 +6,15 @@ body {
 
 .header {
 	display: block;
-	margin: auto;
+	margin: auto;	
 	padding: 10px;
+	// padding-left: 230px;
 	width: 100%;
 	color: #555;
-	text-align: center;
+	background: cornflowerblue;
+	background: #5e86cf;
+	color: #fff;
+	//text-align: center;
 
 	// h1:before {
 	// 	content: "\f227";
@@ -21,18 +25,18 @@ body {
 	h1 {
 		display: inline-block;
 		text-align: right;
+		margin: 0;
 		// background: #eee;
 		// padding: 10px;
 
 	}
 
-	h1:after {
-		display: block;
-		content: "by Bookingbug";
-		font-size: 14px;
-		font-weight: normal;
-		// margin-left: calc(100% - 100px);
-	}
+	// h1:after {
+	// 	display: block;
+	// 	content: "by Bookingbug";
+	// 	font-size: 14px;
+	// 	font-weight: normal;		
+	// }
 }
 
 // table {
@@ -96,10 +100,92 @@ body {
 // }
 
 .ctrls {
-	float: right;
+	display: flex;
+	align-items: center;
+	padding-right: 5px;
+	* {
+		flex-grow: 1;
+	}
 	i {
 		padding: 10px;
 		cursor: pointer;
+	}
+	label, a {
+		flex-grow: 0;
+	}
+	input {
+		align-self: stretch;
+		padding: 5px;
+		margin-right: 22px;
+		font-size: 1em;
+		outline: 0;
+		border: solid 1px #ccc;
+
+	}
+	#fileName {
+		margin-left: 5px;
+	}
+}
+
+.file-container {
+	position: relative;
+	z-index: 1;
+	max-width: 270px;
+	min-width: 270px;
+	height: 50px;
+	align-self: stretch;
+	margin-right: 5px;
+
+	position: fixed;
+	right: 0;
+	bottom: 50px;
+	height: 380px;
+	z-index: 3;
+
+	opacity: 0;
+	pointer-events: none;
+
+	// overflow: hidden;
+	// background: $monitor-black;
+	// color: $monitor-green;
+
+	// &:hover {
+	// 	overflow: visible;
+	// }
+
+
+	.paper {
+		position: absolute;
+		width: 100%;
+		height: 380px;
+		top: 0;
+		left: 0;			
+		border: solid 1px $color-base;
+		padding: 10px;
+		color: #555;
+		background: #fff;
+		transition: opacity .2s;
+		pointer-events: none;
+
+		// &:hover {
+		// 	top: -50px;
+		// }
+
+		h4 {
+			border-bottom: solid 2px $color-base;
+			padding-bottom: 2px;
+			margin-top: 5px;
+			margin-bottom: 10px;
+			color: $color-base;
+		}
+
+		pre {
+			height: 320px;			
+			overflow: hidden;
+			font-size: 10px;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
 	}
 }
 
@@ -359,7 +445,7 @@ body {
 	// width: 380px;
 	height: 30px;
 	// background: rgba(238, 238, 238, 0.5);
-	background: #ccc;
+	background: #222;
 	color: #222;
 
 	.before {
@@ -374,15 +460,29 @@ body {
 		width: 0;
 		height: 100%;
 		// background: rgb(238, 238, 238);
-		background: #eee;
+		background: #fff;
 	}
 }
 #translationsTable {
-	height: 300px;
-	overflow: auto;
+	position: relative;
+	z-index: 2;
+	height: calc(100vh - 140px);
+	
+
+	// overflow: auto;
+	background: #fff;
 	padding-right: 5px;
 	// background: $monitor-black;
 	// padding: 10px;
+
+	.table-headers {
+		margin-right: 22px;
+	}
+
+	.table-rows {
+		padding-right: 5px;
+		overflow-y: scroll;
+	}
 }
 
 .container-flex {
@@ -394,6 +494,10 @@ body {
 
 	&.column-reverse {
 		flex-direction: column-reverse;
+	}
+
+	&.justify-content-space-center {
+		justify-content: center;
 	}
 
 	&.break {

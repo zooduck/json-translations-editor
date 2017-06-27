@@ -2,11 +2,14 @@
 @import "../../node_modules/ionicons/dist/scss/ionicons";
 
 
-[class*="ion"], [class*="fa-"], .icon {
+[class*="ion"], [class*="fa-"] {
 	font-size: 2em;
 	color: $icon-base;
 
 	&:hover {
-		color: lighten($icon-base, 25%);		
+		&:before, &:after {
+			color: lighten($icon-base, 25%);	
+		}
+			
 	}
 }
