@@ -146,7 +146,8 @@ function translationsConsoleService () {
 			let pause = options.pause || 0;
 			for (let msg of Array.from(messages)) {
 				let chars = msg.split("");
-				if (msg !== "Ready!") {
+				// console.log("index: ", messages.indexOf(msg));
+				if (messages.indexOf(msg) !== 0) {
 					chars.unshift("\n\n");
 				}		
 				for (let char of chars) {
@@ -166,14 +167,35 @@ function translationsConsoleService () {
 function createThumbnailTextFile (textData, fileName) {
 	// thumbnail_file.classList.remove("json-parsed", "expand");
 
-	thumbnail_file.classList.remove("print");
+	thumbnail_file.classList.remove("print", "push");
 
-	translations_console.classList.add("data-analysis-mode");
+	// translations_console.classList.add("data-analysis-mode");
 
 	
 	let h4 = thumbnail_file.querySelector("h4");
 	let pre = thumbnail_file.querySelector("pre");
 	let console_pre = translations_console.querySelector("pre");
+
+	
+	// ############################################
+	// NEW LOGIC FOR SCAN FILE ANIMATION (TODO!)
+	translationsConsoleService().clear();
+	translationsConsoleService().log(["Scanning file...", "Done!"], {delay: 50, pause: 2000, pre: console_pre});
+	pre.innerHTML = textData;
+	h4.innerHTML = `# ${fileName}`;
+	setTimeout( () => {
+		thumbnail_file.classList.add("push");
+	}, 10);
+	// thumbnail_file.classList.add("print-feed");
+	setTimeout( function () {
+		thumbnail_file.classList.remove("print-feed", "push");
+		thumbnail_file.classList.add("print");		
+	}, 500);
+
+	return;
+	// END NEW LOGIC (TODO!)
+	// ##############################################
+
 	
 	h4.innerHTML = `# ${fileName}`;
 	let delay = 0;
