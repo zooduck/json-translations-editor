@@ -11,9 +11,15 @@ const thumbnail_file = document.getElementById("thumbnailFile");
 thumbnail_file.addEventListener("click", Services.ThumbnailFileExpand);
 
 const download = document.getElementById("download");
-download.onclick = function () {
-	Services.saveTranslationsToJSON();
+download.onmousedown = function () {
+	// Services.saveTranslationsToJSON();
+	Services.TranslationsService().saveJSON(this);
 }
+
+const searchTable = document.getElementById("searchTable");
+searchTable.addEventListener("keyup", function () {
+	Services.TranslationsTableService().filter(this.value);
+});
 
 
 window.addEventListener("resize", function () {

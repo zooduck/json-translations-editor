@@ -7,12 +7,26 @@
     </head>
     <body>
 
+        <div class="loading-screen" id="loadingScreen">
+
+            <div class="import-prompt" id="importPrompt"></div>
+
+            <div class="file-container basic">
+                <div class="paper" style="border: none;">
+                    <h4 id="paperTitle"></h4>
+                    <pre id="paperContent"></pre>
+                </div>
+            </div>
+
+        </div>
+
         <alert id="alertBar"><h2></h2></alert>
        
         <div class="super-container">
 
              <div class="header">
-                <h1>"JSON": "Translations Editor"</h1>
+               <h1><i class="ion-logo-nodejs"></i></h1>
+               <h1>ON Translations Editor</h1>
             </div>
 
 
@@ -86,16 +100,16 @@
                 <!-- file data -->
                 <div id="fileName"></div>
                 <!-- search table -->
-                <input type="text" placeholder="Search...">
+                <input id="searchTable" type="text" placeholder="Search...">
             </div>
 
              <!-- malenky file preview -->
-            <div class="file-container">
+           <!--  <div class="file-container">
                 <div class="paper">
                     <h4 id="paperTitle"></h4>
                     <pre id="paperContent"></pre>
                 </div>
-            </div>
+            </div> -->
 
 
             <!-- translations table -->
