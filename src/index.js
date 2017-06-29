@@ -13,6 +13,7 @@ thumbnail_file.addEventListener("click", Services.ThumbnailFileExpand);
 const download = document.getElementById("download");
 download.onmousedown = function () {
 	// Services.saveTranslationsToJSON();
+	console.log("mousedown");
 	Services.TranslationsService().saveJSON(this);
 }
 
@@ -21,6 +22,10 @@ searchTable.addEventListener("keyup", function () {
 	Services.TranslationsTableService().filter(this.value);
 });
 
+const alert_confirm_ctrl = document.getElementById("alertBox").querySelector(".alert-confirm-ctrl");
+alert_confirm_ctrl.addEventListener("click", function () {
+	Services.AlertService().dismiss();
+});
 
 window.addEventListener("resize", function () {
 	Services.TranslationsTableService().resize();

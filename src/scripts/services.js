@@ -5,13 +5,18 @@ const progress = document.getElementById("progress");
 const translations_table = document.getElementById("translationsTable");
 const table_rows = translations_table.querySelector(".table-rows");
 const translations_table_row_TEMPLATE = document.getElementById("translationsTableRow_TEMPLATE");
-const alert_bar = document.getElementById("alertBar");
 const translations_console = document.getElementById("translationsConsole");
 const paper_content = document.getElementById("paperContent");
 const paper_title = document.getElementById("paperTitle");
 const file_name = document.getElementById("fileName");
 const import_prompt = document.getElementById("importPrompt");
 const loading_screen = document.getElementById("loadingScreen");
+
+// const alert_bar = document.getElementById("alertBar");
+
+const alert_screen = document.getElementById("alertScreen");
+const alert_box = document.getElementById("alertBox");
+
 
 function buildMalenkyFile (fileName, txt, delay = 0) {
 
@@ -58,17 +63,47 @@ function setProgress (percent = "0%") {
 }
 
 const translationsService = (function(){
+    let importedTranslations = {}
     let translations = {}
+    let commonKeys = {}
     let textData = "";
-    let files = [];
+    let importedFiles = [];
     let getFiles = () => {
-        return files;
+        return importedFiles;
+    }
+    let getCommonKey = (key) => {
+        return commonKeys[key];
     }
     return function () {
         return {
+            setImportedTranslations: (data) => {
+                let obj = JSON.parse(data);
+                importedTranslations = obj;
+            },
+            getImportedTranslations: () => {
+                return importedTranslations;
+            },
             setTranslations: (e) => {
                 let key = e.target.getAttribute("key");
                 let val = e.target.value;
+                let commonKeyPattern = /^COMMON\./;                
+
+                if (key.match(commonKeyPattern)) {
+                    // update all hints relating to this key
+                    for (let row of Array.from(table_rows.children)) {
+                        let en = row.querySelectorAll(".td")[1];
+                        if (en.hasAttribute("common-key")) {
+                            if (en.innerHTML.match(key)) {                               
+                                let hint = en.querySelector(".common-value");
+                                if (val && hint) {                                   
+                                    hint.innerHTML = val;
+                                } else if (hint){                                    
+                                    hint.innerHTML = getCommonKey(key);
+                                }
+                            }
+                        }
+                    }
+                }
                 if (val !== "") {
                     translations[key] = val;
                 } else {
@@ -85,6 +120,9 @@ const translationsService = (function(){
             getTextData: () => {
                 return textData;
             },
+            setCommonKey: (key, val) => {
+                commonKeys[key] = val;
+            },
             saveJSON: (link) => {
                 if (link) {
                     let jsonData = JSON.stringify(flat.unflatten(translations), null, 4);
@@ -98,7 +136,7 @@ const translationsService = (function(){
             },
             pushFile: (file) => {
                 console.log(file);
-                files.push({
+                importedFiles.push({
                     name: file.name.split(".")[0],
                     ext: file.name.split(".")[1]
                 });
@@ -109,6 +147,47 @@ const translationsService = (function(){
         }
     }
 })();
+
+const paginationService = (function() {
+    let pagination = {
+        collections: []
+    }
+    return function () {
+        return {
+             setPages: (delay = 0) => {
+                setTimeout(function () {
+                    let rows = Array.from(table_rows.querySelectorAll(".tr"));
+                    let collectionsAmount = rows.length / 10;
+                    for (let i = 0; i < collectionsAmount; i++) {
+                        pagination.collections.push(rows.splice(0, 10));                       
+                    }
+                    console.log("pagination.collections:", pagination.collections);                  
+                }, delay);           
+            },
+            getPage: (page) => {
+                return pagination.collections[page-1];                
+            }
+        }
+    }
+})();
+
+// let paginationService = function () {
+//     let pagination = {}
+//     return {
+//         setPages: (delay = 0) => {
+//             setTimeout(function () {
+//                 let rows = Array.from(table_rows.querySelectorAll(".tr").entries());
+//                 for (let row of rows) {
+
+//                     console.log(row);
+//                 }
+//             }, delay);           
+//         },
+//         getPage: () => {
+            
+//         }
+//     }
+// }
 
 function translationsTableService () {
     let addRow = (row, delay) => {
@@ -121,17 +200,22 @@ function translationsTableService () {
     }
     let setTableSize = (data) => {
 
+        let space = window.innerHeight - translations_table.offsetTop - 50;
+
         if (table_rows.children.length === 0 && !data) {
            return;
         }
 
-        if (!data) {
-             table_rows.style.height = `${(window.innerHeight - translations_table.offsetTop - 50)}px`;
-             return;
+        if (!data) {                    
+            let h = table_rows.children.length < 10 ? "auto" : `${space}px`;
+            table_rows.style.height = h;
+            // table_rows.style.height = `${(window.innerHeight - translations_table.offsetTop - 50)}px`;
+            return;
         }
 
         let keys = Object.keys(flat.flatten(JSON.parse(data)));
-        let space = window.innerHeight - translations_table.offsetTop - 50;
+        // let space = window.innerHeight - translations_table.offsetTop - 50;
+        
         let h = keys.length < 10 ? "auto" : `${space}px`;
         table_rows.style.height = h;
     }
@@ -154,24 +238,23 @@ function translationsTableService () {
             let numKeys = Object.keys(obj).length;
             //let delayAdd = 1000 / numKeys;
             let delayAdd = 150;
-            let commonKeyPattern = /^@:/;
+            let commonKeyPattern = /^(@:)*COMMON\./;           
 
             for (let prop in obj) {
                     let key = prop;
                     let en = obj[prop].toString();
+             
+                    //let interpolationPattern = /{{.[^}]+}+|{\w+,\s{0,1}plural,\s*|(\=0|\=1|one|other){|[{}]|[A-Z]+_[A-Z]+|(?<={)#/g; js not supports lookbehind so this can't be used
+                    let interpolationPattern = /{{.[^}]+}+|{\w+,\s{0,1}plural,\s*|(\=0|\=1|one|other){#*|[{}]|{+.*[A-Z]+_[A-Z]+.+}/g
 
-                    //let interpolationPattern = /{{.+(?=}}).+}}/g;
-                    // let interpolationPattern = /({{[^{]+}}|{{[^{]+{[^}]+}[^}]}})/g;
-                    let interpolationPattern = /({{[^{]+}}|{{[^{]+{[^}]+}[^}]}}|{(?!{)[^}]+}+)/g;
 
                     let interpolationMatches = en.match(interpolationPattern);
-                    if (interpolationMatches) {
+                    if (interpolationMatches && !en.match(/@:/)) {
                         for (let match of interpolationMatches) {
-                            en = en.replace(match, "<span class=\"interpolation\">"+match+"</span>");
+                            let pattern = new RegExp(match, "g");
+                            en = en.replace(pattern, "<span class=\"interpolation\">"+match+"</span>");
                         }
-                        console.log(en);
-                    }
-                    //console.log(interpolationMatches);
+                    }                  
 
                     let row = translations_table_row_TEMPLATE.cloneNode(true);
                     row.removeAttribute("id");
@@ -180,21 +263,45 @@ function translationsTableService () {
                     row.querySelectorAll(".td")[0].innerHTML = key;
                     row.querySelectorAll(".td")[1].innerHTML = en;
 
+                    if (key.match(commonKeyPattern)) {
+                        translationsService().setCommonKey(key, en);
+                    }
+
+                    if (en.match(commonKeyPattern)) {
+                         row.querySelectorAll(".td")[1].setAttribute("common-key", "");
+                    }
+
+                    if (interpolationMatches) {
+                         row.querySelectorAll(".td")[1].setAttribute("interpolation", "");
+                    }
+
                     if (en.match(commonKeyPattern)) {
                         let commonVal = obj[en.substr(2)];
                         let commonKey = en;
-                        row.querySelectorAll(".td")[1].innerHTML += ` (${commonVal})`;
+                        row.querySelectorAll(".td")[1].innerHTML += `<div class="common-value">${commonVal}</div>`;
                     }
 
-                    row.querySelector("textarea").setAttribute("key", key);
-                    row.querySelector("textarea").addEventListener("keydown", (e) => {
+                    let translationTextarea = row.querySelector("textarea");
+
+                    translationTextarea.setAttribute("key", key);
+
+                    translationTextarea.addEventListener("keydown", function (e) {
                         let key = e.keyCode || e.charCode;
                         if (key === 13) {
                             e.preventDefault();
                         }
                     });
 
-                    row.querySelector("textarea").addEventListener("keyup", (e) => {
+                    translationTextarea.addEventListener("click", function (e) {
+                        let en = this.parentNode.parentNode.querySelectorAll(".td")[1];
+                        if (en.hasAttribute("interpolation")) {
+                            let imported_interpolation_value = translationsService().getImportedTranslations()[this.getAttribute("key")];
+                            this.value = imported_interpolation_value;
+                        }
+                    });
+
+                    translationTextarea.addEventListener("keyup", function (e) {
+
                         let key = e.keyCode || e.charCode;
                         if (key === 13) {
                             e.preventDefault();
@@ -209,11 +316,17 @@ function translationsTableService () {
 
                     });
 
-
                     addRow(row, delay);
 
                     delay += delay < 1200? delayAdd : 0;
+
             }
+
+            paginationService().setPages(delay);
+            setTimeout(function(){
+                console.log(paginationService().getPage(1));
+            }, delay + 1000);
+            
             console.log("END BUILD");
         },
         resize: () => {
@@ -225,175 +338,12 @@ function translationsTableService () {
                 if (!child.className.match(/tr/)) {
                     continue;
                 }
-                // console.log(child);
                 tableRows.removeChild(child);
             }
             setTableSize(data);
         }
     }
 }
-// function buildTranslationsTable (jsonData) {
-//     let obj = JSON.parse(jsonData);
-//     obj = flat(obj); // flatten
-//     let delay = 0;
-//     let numKeys = Object.keys(obj).length;
-//     //let delayAdd = 1000 / numKeys;
-//     let delayAdd = 150;
-//     let commonKeyPattern = /^@:/;
-
-//     for (let prop in obj) {
-//             let key = prop;
-//             let en = obj[prop].toString();
-
-//             let row = translations_table_row_TEMPLATE.cloneNode(true);
-//             row.classList.remove("template");
-
-//             row.querySelectorAll(".td")[0].innerHTML = key;
-//             row.querySelectorAll(".td")[1].innerHTML = en;
-
-//             if (en.match(commonKeyPattern)) {
-//                 let commonVal = obj[en.substr(2)];
-//                 let commonKey = en;
-//                 row.querySelectorAll(".td")[1].innerHTML += ` (${commonVal})`;
-//             }
-
-//             row.querySelector("textarea").setAttribute("key", key);
-//             row.querySelector("textarea").addEventListener("keydown", (e) => {
-//                 let key = e.keyCode || e.charCode;
-//                 if (key === 13) {
-//                     e.preventDefault();
-//                 }
-//             });
-//             row.querySelector("textarea").addEventListener("blur", (e) => {
-//                 let key = e.keyCode || e.charCode;
-//                 if (key === 13) {
-//                     e.preventDefault();
-//                 }
-//                 if (e.target.value != "") {
-//                     e.target.parentNode.previousElementSibling.classList.add("line-through");
-//                 } else {
-//                     e.target.parentNode.previousElementSibling.classList.remove("line-through");
-//                 }
-
-//                 translationsService().update(e);
-
-//                 // let translations = translationsService().getTranslations();
-
-//                 // let arr = [];
-//                 // for (let key in translations) {
-//                 //  arr.push(`${key}:${translations[key]}`);
-//                 // }
-//                 // translationsConsoleService().clear(1);
-//                 // translationsConsoleService().log(arr, {delay: 0, pause: 0, pre: translations_console.querySelectorAll("pre")[1]});
-//                 // console.log(translationsService().getTranslations());
-//             });
-
-//             addRow(row, delay);
-
-//             delay += delay < 1200? delayAdd : 0;
-//             console.log(delay);
-//     }
-// }
-
-function translationsConsoleService () {
-    return {
-        log: (msgArray = null, options = {delay: 50, pause: 1000, pre: translations_console.querySelector("pre")}) => {
-            translations_console.classList.remove("data-analysis-mode");
-            console.log(options);
-            let messages = msgArray || [
-                "Ready!",
-                "You can now edit translations in the table below."
-            ];
-            let delay = 0;
-            let pause = options.pause || 0;
-            for (let msg of Array.from(messages)) {
-                let chars = msg.split("");
-                // console.log("index: ", messages.indexOf(msg));
-                if (messages.indexOf(msg) !== 0) {
-                    chars.unshift("\n\n");
-                }
-                for (let char of chars) {
-                    setTimeout(function(){
-                        options.pre.innerHTML += char;
-                    }, delay);
-                    delay += options.delay || 0;
-                }
-                delay += pause;
-            }
-        },
-        clear: (preIndex = 0) => {
-            translations_console.querySelectorAll("pre")[preIndex].innerHTML = "";
-        }
-    }
-}
-
-// function createThumbnailTextFile (textData, fileName) {
-//     // thumbnail_file.classList.remove("json-parsed", "expand");
-
-//     thumbnail_file.classList.remove("print", "push");
-
-//     // translations_console.classList.add("data-analysis-mode");
-
-
-//     let h4 = thumbnail_file.querySelector("h4");
-//     let pre = thumbnail_file.querySelector("pre");
-//     let console_pre = translations_console.querySelector("pre");
-
-
-//     // ############################################
-//     // NEW LOGIC FOR SCAN FILE ANIMATION (TODO!)
-//     translationsConsoleService().clear();
-//     translationsConsoleService().log(["Scanning file...", "Done!"], {delay: 50, pause: 2000, pre: console_pre});
-//     pre.innerHTML = textData;
-//     h4.innerHTML = `# ${fileName}`;
-//     setTimeout( () => {
-//         thumbnail_file.classList.add("push");
-//     }, 10);
-//     // thumbnail_file.classList.add("print-feed");
-//     setTimeout( function () {
-//         thumbnail_file.classList.remove("print-feed", "push");
-//         thumbnail_file.classList.add("print");
-//     }, 500);
-
-
-//     // END NEW LOGIC (TODO!)
-//     // ##############################################
-
-//     return;
-
-
-//     h4.innerHTML = `# ${fileName}`;
-//     let delay = 0;
-//     let delayAdds = [];
-//     let totalDelay = 0;
-//     let iterations = 50;
-//     for (let i = 0; i < iterations; i++) {
-//         let delayAdd = Math.floor(Math.random() * 100) % 2 == 0? 40 : 100;
-//         delayAdds.push(delayAdd);
-//         totalDelay += delayAdd;
-//     }
-//     for (let i = 0; i < iterations; i++) {
-//         let shuffledText = textShuffle(textData);
-//         applyShuffledText(shuffledText, console_pre, delay, totalDelay);
-//         delay += delayAdds.pop();
-//     }
-
-//     setTimeout(() => {
-//         // thumbnail_file.classList.add("json-parsed");
-//         thumbnail_file.classList.add("print");
-//     }, totalDelay);
-
-//     setTimeout(function(){
-//         pre.innerHTML = textData;
-//         //console_pre.innerHTML = "Ready!\n\nThe JSON file you uploaded is displayed on the left.\n\nEdit translations in the table below.";
-//         translationsConsoleService().clear();
-//         translationsConsoleService().log();
-
-//         setProgress("100%");
-//         // thumbnail_file.classList.add("json-parsed");
-//         buildTranslationsTable(textData);
-//     }, totalDelay + 250);
-// }
 
 function isValidJSON (data) {
     try {
@@ -425,7 +375,7 @@ function alertService () {
     return {
         raise: (errorKey, options = {msg: "", type: ""}) => {
             let errorMsg = "";
-            let type = options.type || errorKey.split(".")[0];
+            let type = options.type || errorKey.split(".")[0];           
 
             if (errorKey === "CUSTOM") {
                 errorMsg = options.msg;
@@ -433,21 +383,36 @@ function alertService () {
                 errorMsg = errorService().getMsg(errorKey);
             }
 
-            alert_bar.querySelector("h2").innerHTML = errorMsg;
+            alert_screen.querySelector(".alert-msg").innerHTML = errorMsg;
+            alert_box.classList.remove("pop", "error", "success");
 
-            alert_bar.classList.remove("active", "error", "success");
+            alert_box.querySelector(".alert-msg").innerHTML = errorMsg;
+
+
+            // alert_bar.querySelector("h2").innerHTML = errorMsg;
+
+            // alert_bar.classList.remove("active", "error", "success");
 
             if (type.match(/error/i)) {
-                alert_bar.classList.add("error");
+                // alert_bar.classList.add("error");
+                alert_box.classList.add("error");
             } else if (type.match(/success/i)) {
-                alert_bar.classList.add("success");
+                // alert_bar.classList.add("success");
+                alert_box.classList.add("success");
             }
 
-            alert_bar.classList.add("active");
+            // alert_bar.classList.add("active");
 
-            setTimeout(() => {
-                alert_bar.classList.remove("active");
-            }, 2500);
+            alert_screen.classList.add("active");
+            alert_box.classList.add("pop");
+
+            // setTimeout(() => {
+            //     alert_bar.classList.remove("active");
+            // }, 2500);
+        },
+        dismiss: () => {
+            alert_screen.classList.remove("active");
+            alert_box.classList.remove("pop", "error", "success");
         }
     }
 }
@@ -458,18 +423,18 @@ function malenkyFileService () {
         part.innerHTML = txt;
         setTimeout( () => {
              paper_content.appendChild(part);
-             paper_content.scrollTop = scrollHeight;            
-         }, delay);     
+             paper_content.scrollTop = scrollHeight;
+         }, delay);
     }
-    let getContentHeight = (data) => {       
+    let getContentHeight = (data) => {
         paper_content.innerHTML = data;
         return paper_content.scrollHeight;
     }
     let init = () => {
-        import_prompt.innerHTML = "Importing file";     
+        import_prompt.innerHTML = "Importing file";
         paper_title.innerHTML = "";
         paper_content.innerHTML = "";
-        loadingService().show();   
+        loadingService().show();
     }
     return {
         calculateContentHeight: (data) => {
@@ -477,17 +442,17 @@ function malenkyFileService () {
             return paper_content.scrollHeight;
         },
         build: (data, fileName) => {
-           
-            let delay = 0;
-            let delayAdd = 20;         
+
+            let delay = 500;
+            let delayAdd = 20;
             let sliceTo = 50;
-            let sliceFrom = 0;          
-            let snippet = data.length >= 5000 ? data.substr(0, 2500) + data.substr(-2500) : data;            
-            let scrollHeight = getContentHeight(snippet);           
+            let sliceFrom = 0;
+            let snippet = data.length >= 5000 ? data.substr(0, 2500) + data.substr(-2500) : data;
+            let scrollHeight = getContentHeight(snippet);
 
-            init(); 
+            init();
 
-            paper_title.innerHTML = fileName; 
+            paper_title.innerHTML = fileName;
 
             let numChars = snippet.length;
             let iterations = numChars / sliceTo;
@@ -514,13 +479,13 @@ const loadingService = (function(){
             show: (delay = 0) => {
                 setTimeout( () => {
                     loading_screen.classList.add("active");
-                }, delay);            
+                }, delay);
             },
             hide: (delay = 0) => {
                 setTimeout( () => {
                     loading_screen.classList.remove("active");
                     loadingService().setLoaded();
-                }, delay);               
+                }, delay);
             },
             isLoading: () => {
                return isLoaded;
@@ -546,10 +511,9 @@ export default {
         console.log(ES6_ARROW_FN);
     },
     FileHandler() {
-        // paper_content.parentNode.parentNode.classList.remove("file-add");
-        
+
         loadingService().setLoading();
-        
+
         let files = this.files;
         for (let file of files) {
             let reader = new FileReader();
@@ -560,59 +524,35 @@ export default {
 
                     file_name.innerHTML = file.name;
 
+                    translationsService().setImportedTranslations(textData);
+
                     translationsService().setTextData(textData);
                     translationsService().pushFile(file);
 
-                    // buildMalenkyFile(file.name, textData.substr(0, 1000), 500);
-                    // console.log(malenkyFileService().calculateContentHeight(textData)); return;
-                    
-
                     malenkyFileService().build(textData, file.name);
 
+                    translationsTableService().init(textData);
 
-
-                    translationsTableService().init(textData);                    
-                    
-                    let interval = setInterval(function(){                       
-                        if (loadingService().isLoading()) {                           
+                    let interval = setInterval(function(){
+                        if (loadingService().isLoading()) {
                             translationsTableService().build(textData);
-                            clearInterval(interval);                            
+                            clearInterval(interval);
                         }
-                    }, 100);
-
-
-                 
-
-
-                    // console.log(translationsService().getTextData());
-
-                    // setTimeout(function() {
-                    //       paper_content.parentNode.parentNode.classList.add("file-add");
-                    // }, 10);
-
-                    // setTimeout( () => {
-                    //      paper_content.parentNode.parentNode.classList.add("file-add");
-                    // }, 10);
-
-
-                    return
-
-                    createThumbnailTextFile(textData, file.name);
+                    }, 1000);
                 } else {
                     alertService().raise("CUSTOM", {msg: checkValid.error, type: "ERROR"});
                 }
-
             }
             reader.readAsText(file);
         }
-    },
-    ThumbnailFileExpand(e) {
-        e.target.parentNode.classList.toggle("expand");
     },
     TranslationsTableService() {
         return translationsTableService();
     },
     TranslationsService() {
         return translationsService();
+    },
+    AlertService() {
+        return alertService();
     }
 }
