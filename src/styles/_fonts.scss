@@ -2,7 +2,7 @@
 @import "../../node_modules/ionicons/dist/scss/ionicons";
 
 
-[class*="ion-"], [class*="fa-"] {
+[class^="ion-"], [class^="fa fa-"] {
 	font-size: 2em;
 	color: $icon-base;
 

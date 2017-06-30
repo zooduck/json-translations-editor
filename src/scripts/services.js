@@ -11,6 +11,7 @@ const paper_title = document.getElementById("paperTitle");
 const file_name = document.getElementById("fileName");
 const import_prompt = document.getElementById("importPrompt");
 const loading_screen = document.getElementById("loadingScreen");
+const pagination_ctrls = document.getElementById("paginationCtrls");
 
 // const alert_bar = document.getElementById("alertBar");
 
@@ -149,55 +150,72 @@ const translationsService = (function(){
 })();
 
 const paginationService = (function() {
-    let pagination = {
-        collections: []
-    }
+    let pagination = {}
+    let currentPage = 1;
+    let itemsPerPage = 50;
+    const updateCurrentPage = (page) => {
+        currentPage = page;
+    };
+    const showCtrls = () => {
+        pagination_ctrls.classList.add("active");
+    };
+    const loadPage = (page = 1) => {
+        let pageToLoad = pagination.collections[page - 1];
+        if (pageToLoad) {
+            showCtrls();
+            pagination_ctrls.querySelector(".pagination-info").innerHTML = `page ${page} of ${pagination.collections.length}`;
+            for (let row of Array.from(table_rows.children)) {
+                row.parentNode.removeChild(row);
+            }
+            for (let row of pageToLoad) {
+                table_rows.appendChild(row);
+            }
+            updateCurrentPage(page);
+        }
+    };
     return function () {
         return {
-             setPages: (delay = 0) => {
-                setTimeout(function () {
-                    let rows = Array.from(table_rows.querySelectorAll(".tr"));
-                    let collectionsAmount = rows.length / 10;
-                    for (let i = 0; i < collectionsAmount; i++) {
-                        pagination.collections.push(rows.splice(0, 10));                       
-                    }
-                    console.log("pagination.collections:", pagination.collections);                  
-                }, delay);           
+             setPages: (rows) => {
+                pagination.collections = [];     
+                let collectionsAmount = rows.length / itemsPerPage;
+                for (let i = 0; i < collectionsAmount; i++) {
+                    pagination.collections.push(rows.splice(0, itemsPerPage));                       
+                }
+                console.log("pagination.collections:", pagination.collections);                
+                loadPage(); // load first page       
             },
-            getPage: (page) => {
-                return pagination.collections[page-1];                
+            loadNextPage: () => {
+                return loadPage(currentPage + 1);            
+            },
+            loadPreviousPage: () => {
+                return loadPage(currentPage - 1);
+            },
+            showCtrls: () => {
+                return showCtrls();
+            },
+            hideCtrls: () => {
+                pagination_ctrls.classList.remove("active");
             }
         }
     }
 })();
 
-// let paginationService = function () {
-//     let pagination = {}
-//     return {
-//         setPages: (delay = 0) => {
-//             setTimeout(function () {
-//                 let rows = Array.from(table_rows.querySelectorAll(".tr").entries());
-//                 for (let row of rows) {
-
-//                     console.log(row);
-//                 }
-//             }, delay);           
-//         },
-//         getPage: () => {
-            
-//         }
-//     }
-// }
-
 function translationsTableService () {
-    let addRow = (row, delay) => {
-        setTimeout( () => {
-            translations_table.children[1].appendChild(row);
-        }, delay);
-        setTimeout( () => {
-            row.classList.remove("shutter-in");
-        }, delay + 500);
-    }
+    let rows = [];
+    // let addRow = (row, delay) => {
+    //     setTimeout( () => {
+    //         translations_table.children[1].appendChild(row);
+    //     }, delay);
+    //     setTimeout( () => {
+    //         row.classList.remove("shutter-in");
+    //     }, delay + 500);
+    // };
+    let getRows = () => {
+        return rows;
+    };
+    let addRow = (row) => {
+        rows.push(row);
+    };
     let setTableSize = (data) => {
 
         let space = window.innerHeight - translations_table.offsetTop - 50;
@@ -218,7 +236,7 @@ function translationsTableService () {
         
         let h = keys.length < 10 ? "auto" : `${space}px`;
         table_rows.style.height = h;
-    }
+    };
     return {
         filter: (data) => {
             let pattern = new RegExp(data, "i");
@@ -234,10 +252,13 @@ function translationsTableService () {
             console.log("START BUILD");
             let obj = JSON.parse(data);
             obj = flat(obj); // flatten
-            let delay = 0;
+           
             let numKeys = Object.keys(obj).length;
             //let delayAdd = 1000 / numKeys;
-            let delayAdd = 150;
+
+            // let delay = 0;
+            // let delayAdd = 150;
+            
             let commonKeyPattern = /^(@:)*COMMON\./;           
 
             for (let prop in obj) {
@@ -311,21 +332,17 @@ function translationsTableService () {
                         } else {
                             e.target.parentNode.previousElementSibling.classList.remove("line-through");
                         }
-
                         translationsService().setTranslations(e);
-
                     });
 
-                    addRow(row, delay);
+                    //addRow(row, delay);
+                    addRow(row);
 
-                    delay += delay < 1200? delayAdd : 0;
-
+                    // delay += delay < 1200? delayAdd : 0;
             }
 
-            paginationService().setPages(delay);
-            setTimeout(function(){
-                console.log(paginationService().getPage(1));
-            }, delay + 1000);
+            let rows = getRows();
+            paginationService().setPages(rows);
             
             console.log("END BUILD");
         },
@@ -340,6 +357,7 @@ function translationsTableService () {
                 }
                 tableRows.removeChild(child);
             }
+            paginationService().hideCtrls();            
             setTableSize(data);
         }
     }
@@ -535,7 +553,7 @@ export default {
 
                     let interval = setInterval(function(){
                         if (loadingService().isLoading()) {
-                            translationsTableService().build(textData);
+                            translationsTableService().build(textData);                           
                             clearInterval(interval);
                         }
                     }, 1000);
@@ -554,5 +572,8 @@ export default {
     },
     AlertService() {
         return alertService();
+    },
+    PaginationService() {
+        return paginationService();
     }
 }

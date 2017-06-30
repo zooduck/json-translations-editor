@@ -7,8 +7,8 @@ Services.es6BabelTest();
 const file_input = document.getElementById("file");
 file_input.addEventListener("change", Services.FileHandler);
 
-const thumbnail_file = document.getElementById("thumbnailFile");
-thumbnail_file.addEventListener("click", Services.ThumbnailFileExpand);
+// const thumbnail_file = document.getElementById("thumbnailFile");
+// thumbnail_file.addEventListener("click", Services.ThumbnailFileExpand);
 
 const download = document.getElementById("download");
 download.onmousedown = function () {
@@ -26,6 +26,15 @@ const alert_confirm_ctrl = document.getElementById("alertBox").querySelector(".a
 alert_confirm_ctrl.addEventListener("click", function () {
 	Services.AlertService().dismiss();
 });
+
+const paginatonCtrls = document.getElementById("paginationCtrls");
+paginationCtrls.querySelectorAll("i")[0].addEventListener("click", function () {
+	Services.PaginationService().loadPreviousPage();
+});
+paginationCtrls.querySelectorAll("i")[1].addEventListener("click", function () {
+	Services.PaginationService().loadNextPage();
+});
+
 
 window.addEventListener("resize", function () {
 	Services.TranslationsTableService().resize();

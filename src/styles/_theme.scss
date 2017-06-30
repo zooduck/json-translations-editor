@@ -34,7 +34,7 @@ body {
 
 	h1 {
 		display: inline-block;
-		text-align: right;
+		// text-align: right;
 		margin: 0;
 		// background: #eee;
 		// padding: 10px;
@@ -140,14 +140,28 @@ body {
 	input {
 		align-self: stretch;
 		padding: 5px;
-		margin-right: 22px;
+		margin-left: 10px;
+		margin-right: 10px;
+		// margin-right: 22px;
 		font-size: 1em;
 		outline: 0;
 		border: solid 1px #ccc;
+		width: 100px;
 
 	}
 	#fileName {
 		margin-left: 5px;
+	}
+	.pagination-ctrls {
+		display: flex;
+		flex-grow: 0;
+		align-items: center;
+		text-align: center;
+		visibility: hidden;
+
+		&.active {
+			visibility: visible;
+		}
 	}
 }
 

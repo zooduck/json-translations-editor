@@ -7,8 +7,8 @@
     </head>
     <body>
 
+        <!-- loading screen -->
         <div class="loading-screen" id="loadingScreen">
-
             <div class="import-prompt" id="importPrompt"></div>
 
             <div class="file-container basic">
@@ -17,83 +17,30 @@
                     <pre id="paperContent"></pre>
                 </div>
             </div>
-
         </div>
 
-        <alert id="alertBar"><h2></h2></alert>
+     <!--    <alert id="alertBar"><h2></h2></alert> -->
 
+        
+        <!-- alert screen -->
         <div class="alert-screen" id="alertScreen">
             <div class="alert-box" id="alertBox">
                 
-                <div class="alert-msg">Domper!</div>
+                <div class="alert-msg"></div>
                 <button type="button" class="alert-confirm-ctrl">OK</button>
 
             </div>
         </div>
-       
+
+
+
+        <!-- super container -->
         <div class="super-container">
 
              <div class="header">
                <h1><i class="ion-logo-nodejs"></i></h1>
                <h1>ON Translations Editor</h1>
             </div>
-
-
-
-
-            <!-- JSON file thumbnail / dropzone -->
-<!--             <div class="container-flex column-reverse">
-                <div id="thumbnailFile" class="thumbnail-file">
-                    <h4># no file</h4>
-                </div>
-                <div class="progress" id="progress">
-                    <div class="before">0%</div>
-                    <div class="progress-bar"></div>
-                </div>
-            </div> -->
-
-
-
-           <!--  <div class="container-flex">
-                 <div class="progress" id="progress">
-                    <div class="before">0%</div>
-                    <div class="progress-bar"></div>
-                </div>
-            </div> -->
-
-            <div class="container-flex justify-content-center" style="display:none">
-               
-               <!-- <div id="thumbnailFile" class="thumbnail-file print" style="display:none">
-                    <h4># no file</h4>                   
-                    <pre></pre>
-                </div> -->
-
-                <div class="printer">
-                    <div class="parts"></div>
-                    <div class="parts"></div>
-                    <div class="parts"></div>
-                     <div id="thumbnailFile" class="paper">
-                        <h4>#</h4>                   
-                        <pre></pre>
-                    </div>
-                </div>
-
-                  <div id="translationsConsole" class="console"> 
-                    <div class="progress" id="progress">
-                        <div class="before">0%</div>
-                        <div class="progress-bar"></div>
-                    </div>           
-                    <pre></pre>
-                    <pre></pre>
-
-                    <!-- <pre>*** hint ***</pre>
-                    <pre class="hint add-file">&lt;&lt; To upload your translations file.</pre>
-                    <pre class="hint save-file">&lt;&lt; To download your translations in JSON format.</pre> -->
-                </div>
-               
-            </div>
-
-
 
             <!-- ctrls -->
              <div class="ctrls container-flex break">
@@ -107,18 +54,16 @@
                     <i class="fa fa-save"></i>
                 </a>
                 <!-- file data -->
-                <div id="fileName"></div>
+                <div id="fileName" style="display:none"></div>
                 <!-- search table -->
                 <input id="searchTable" type="text" placeholder="Search...">
-            </div>
-
-             <!-- malenky file preview -->
-           <!--  <div class="file-container">
-                <div class="paper">
-                    <h4 id="paperTitle"></h4>
-                    <pre id="paperContent"></pre>
+                <!-- pagination -->
+                <div class="pagination-ctrls" id="paginationCtrls">
+                    <i class="ion-ios-rewind-outline"></i>
+                    <span class="pagination-info"></span>
+                    <i class="ion-ios-fastforward-outline"></i>
                 </div>
-            </div> -->
+            </div>
 
 
             <!-- translations table -->
