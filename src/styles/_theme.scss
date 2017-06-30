@@ -222,6 +222,21 @@ button {
 		background: tomato;
 		color: #fff;
 
+		i {
+			color: #fff;
+			margin-right: 5px;
+
+			&:before {
+				margin-right: 5px;
+			}
+
+			&:hover {
+				&:before {
+					color: #fff;
+				}
+			}
+		}
+
 		button.alert-confirm-ctrl {
 			background: #fff;
 			color: tomato;
@@ -604,6 +619,17 @@ button {
 		background: #fff;
 	}
 }
+
+$delays: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;
+@mixin compoundedDelays () {
+	$delay-amount: 100;
+  	@each $delay in $delays {
+    	&:nth-of-type(#{$delay}) {
+      	animation-delay: #{$delay * $delay-amount}ms;
+    }    
+  }
+}
+
 #translationsTable {
 	position: relative;
 	z-index: 2;
@@ -640,6 +666,23 @@ button {
 				background: lavender;
 				padding: 5px;
 			}
+			.interpolation-warning {
+				margin-top: 5px;
+				background: tomato;
+				color: #fff;
+				padding: 5px;
+				display: flex;
+				align-items: center;
+				&:before {
+					font-family: Ionicons;
+					content: "\f3a5";
+					font-size: 2em;
+					margin-right: 5px;
+				}
+			}
+
+			@include compoundedDelays();			
+
 		}
 	}
 }

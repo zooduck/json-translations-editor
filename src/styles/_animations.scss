@@ -1,4 +1,4 @@
-@keyframes shutterIn {
+@keyframes shutterIn_fromLeft {
 	from {
 		opacity: 1;
 		transform: rotateX(90deg) translate(-100%);
@@ -12,8 +12,41 @@
 }
 
 .shutter-in {
-	animation: shutterIn .5s both;
+	animation: shutterIn_fromLeft .5s both;
 }
+
+
+@keyframes popIn {
+	0% {
+		opacity: 0;
+		transform: scale(.5);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+.pop-in {
+	animation: popIn .5s both;
+
+	&.key {
+		//animation-duration: calc(.5s / 2);
+		animation-duration: .5s;
+	}
+	&.en {
+		//animation-delay: calc(.25s / 2);		
+		animation-duration: 1s;
+		
+	}
+	&.trans {
+		//animation-delay: calc(.5s / 2);
+		animation-duration: .5s;
+		animation-delay: .5s;
+		
+	}
+}
+
 
 @keyframes blink {
 	0% {
@@ -35,7 +68,11 @@
 		opacity: 0;
 		transform: scale(0.5);
 	}
-	70% {
+	50% {
+		opacity: 1;
+		transform: scale(1.2);
+	}
+	80% {
 		opacity: 1;
 		transform: scale(1.2);
 	}

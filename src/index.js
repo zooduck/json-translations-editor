@@ -10,12 +10,11 @@ file_input.addEventListener("change", Services.FileHandler);
 // const thumbnail_file = document.getElementById("thumbnailFile");
 // thumbnail_file.addEventListener("click", Services.ThumbnailFileExpand);
 
-const download = document.getElementById("download");
-download.onmousedown = function () {
-	// Services.saveTranslationsToJSON();
-	console.log("mousedown");
+const exportTranslations = document.getElementById("exportTranslations");
+exportTranslations.addEventListener("click", function () {
 	Services.TranslationsService().saveJSON(this);
-}
+});
+
 
 const searchTable = document.getElementById("searchTable");
 searchTable.addEventListener("keyup", function () {

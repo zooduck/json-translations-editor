@@ -49,12 +49,18 @@
                 <label for="file">
                     <i class="ion-md-add"></i>
                 </label>
-                <!-- save file -->
-                <a id="download" download="translations.json" href="../img/example.jpg">
-                    <i class="fa fa-save"></i>
+                <!-- download file -->
+                <a id="exportTranslations" download="" href="">
+                    <i class="ion-md-cloud-download"></i>
                 </a>
+                <!-- save progress -->
+                <a id="saveProgress" download="" href="">
+                    <i class="fa fa-save"></i>
+                </a>    
+                            
                 <!-- file data -->
-                <div id="fileName" style="display:none"></div>
+                <div id="fileName"></div>
+
                 <!-- search table -->
                 <input id="searchTable" type="text" placeholder="Search...">
                 <!-- pagination -->
@@ -78,9 +84,9 @@
 
             <!-- templates -->
             <div id="translationsTableRow_TEMPLATE" class="container-flex tr shutter-in template">
-                <div class="td">CORE.ALERTS.GENERIC_ERROR</div>
-                <div class="td">We are sorry but there seems to be a problem.</div>
-                <div class="td">
+                <div class="td pop-in key">CORE.ALERTS.GENERIC_ERROR</div>
+                <div class="td pop-in en">We are sorry but there seems to be a problem.</div>
+                <div class="td pop-in trans">
                      <textarea rows="1" placeholder="..."></textarea>    
                 </div>
             </div>

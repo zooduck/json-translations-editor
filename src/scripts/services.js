@@ -66,14 +66,45 @@ function setProgress (percent = "0%") {
 const translationsService = (function(){
     let importedTranslations = {}
     let translations = {}
+    let jsonTranslations = "{}";
     let commonKeys = {}
     let textData = "";
     let importedFiles = [];
     let getFiles = () => {
         return importedFiles;
-    }
+    };
     let getCommonKey = (key) => {
         return commonKeys[key];
+    };
+    let syncCommonKeyValues = (key, val) => {
+        let commonKeyPattern = /^COMMON\./;
+        if (key.match(commonKeyPattern)) {
+            // update all hints relating to this key
+            for (let row of Array.from(table_rows.children)) {
+                let en = row.querySelectorAll(".td")[1];
+                if (en.hasAttribute("common-key")) {
+                    if (en.innerHTML.match(key)) {
+                        let hint = en.querySelector(".common-value");
+                        if (val && hint) {
+                            hint.innerHTML = val;
+                        } else if (hint){
+                            hint.innerHTML = getCommonKey(key);
+                        }
+                    }
+                }
+            }
+        }
+    };
+    const setTranslationsAsJSON = (data = null) => {
+        if (data) { // init
+            return jsonTranslations = data;
+        }
+        // update
+        let obj = JSON.parse(jsonTranslations);
+        for (let key in translations) {
+            obj[key] = translations[key];
+        }
+        return jsonTranslations = JSON.stringify(obj, null, 4);        
     }
     return function () {
         return {
@@ -84,32 +115,21 @@ const translationsService = (function(){
             getImportedTranslations: () => {
                 return importedTranslations;
             },
+            SetTranslationsAsJSON: (data) => {
+                return setTranslationsAsJSON(data);
+            },
             setTranslations: (e) => {
                 let key = e.target.getAttribute("key");
                 let val = e.target.value;
-                let commonKeyPattern = /^COMMON\./;                
 
-                if (key.match(commonKeyPattern)) {
-                    // update all hints relating to this key
-                    for (let row of Array.from(table_rows.children)) {
-                        let en = row.querySelectorAll(".td")[1];
-                        if (en.hasAttribute("common-key")) {
-                            if (en.innerHTML.match(key)) {                               
-                                let hint = en.querySelector(".common-value");
-                                if (val && hint) {                                   
-                                    hint.innerHTML = val;
-                                } else if (hint){                                    
-                                    hint.innerHTML = getCommonKey(key);
-                                }
-                            }
-                        }
-                    }
-                }
+                syncCommonKeyValues(key, val);
+
                 if (val !== "") {
                     translations[key] = val;
                 } else {
                     delete translations[key];
                 }
+                console.log(setTranslationsAsJSON());
                 return translations;
             },
             getTranslations: () => {
@@ -133,6 +153,16 @@ const translationsService = (function(){
                     link.href = file;
 
                     console.log("output: ", jsonData);
+                }
+            },
+            saveProgress: (link) => {
+                if (link) {
+                    let textData = new Blob([jsonTranslations], {type: "text/plain"});
+                    link.download = `test.json`;
+                    let file = window.URL.createObjectURL(textData);
+                    link.href = file;
+
+                    console.log("output: ", textData); 
                 }
             },
             pushFile: (file) => {
@@ -173,19 +203,32 @@ const paginationService = (function() {
             updateCurrentPage(page);
         }
     };
+    const getPages = () => {
+        return pagination;
+    };
     return function () {
         return {
-             setPages: (rows) => {
-                pagination.collections = [];     
+            setPages: (rows) => {
+                pagination.collections = [];
                 let collectionsAmount = rows.length / itemsPerPage;
                 for (let i = 0; i < collectionsAmount; i++) {
-                    pagination.collections.push(rows.splice(0, itemsPerPage));                       
+                    pagination.collections.push(rows.splice(0, itemsPerPage));
                 }
-                console.log("pagination.collections:", pagination.collections);                
-                loadPage(); // load first page       
+                console.log("pagination.collections:", pagination.collections);
+                loadPage(); // load first page
+
+                let shutterInDelays = 100 * 11; // there is a 100ms compounded animation-delay on first 10 rows
+                setTimeout(function() {
+                   console.log(getPages());
+                   for (let collection of getPages().collections) {
+                        for (let row of collection) {
+                            row.classList.remove("shutter-in");
+                        }
+                   }
+                }, (shutterInDelays));
             },
             loadNextPage: () => {
-                return loadPage(currentPage + 1);            
+                return loadPage(currentPage + 1);
             },
             loadPreviousPage: () => {
                 return loadPage(currentPage - 1);
@@ -202,14 +245,6 @@ const paginationService = (function() {
 
 function translationsTableService () {
     let rows = [];
-    // let addRow = (row, delay) => {
-    //     setTimeout( () => {
-    //         translations_table.children[1].appendChild(row);
-    //     }, delay);
-    //     setTimeout( () => {
-    //         row.classList.remove("shutter-in");
-    //     }, delay + 500);
-    // };
     let getRows = () => {
         return rows;
     };
@@ -224,7 +259,7 @@ function translationsTableService () {
            return;
         }
 
-        if (!data) {                    
+        if (!data) {
             let h = table_rows.children.length < 10 ? "auto" : `${space}px`;
             table_rows.style.height = h;
             // table_rows.style.height = `${(window.innerHeight - translations_table.offsetTop - 50)}px`;
@@ -233,7 +268,7 @@ function translationsTableService () {
 
         let keys = Object.keys(flat.flatten(JSON.parse(data)));
         // let space = window.innerHeight - translations_table.offsetTop - 50;
-        
+
         let h = keys.length < 10 ? "auto" : `${space}px`;
         table_rows.style.height = h;
     };
@@ -252,37 +287,46 @@ function translationsTableService () {
             console.log("START BUILD");
             let obj = JSON.parse(data);
             obj = flat(obj); // flatten
-           
+
             let numKeys = Object.keys(obj).length;
             //let delayAdd = 1000 / numKeys;
 
             // let delay = 0;
             // let delayAdd = 150;
-            
-            let commonKeyPattern = /^(@:)*COMMON\./;           
+
+            let commonKeyPattern = /^(@:)*COMMON\./;
 
             for (let prop in obj) {
                     let key = prop;
                     let en = obj[prop].toString();
-             
+                    let enPretty = en;
+
                     //let interpolationPattern = /{{.[^}]+}+|{\w+,\s{0,1}plural,\s*|(\=0|\=1|one|other){|[{}]|[A-Z]+_[A-Z]+|(?<={)#/g; js not supports lookbehind so this can't be used
-                    let interpolationPattern = /{{.[^}]+}+|{\w+,\s{0,1}plural,\s*|(\=0|\=1|one|other){#*|[{}]|{+.*[A-Z]+_[A-Z]+.+}/g
+                    // let interpolationPattern = /{{.[^}]+}+|{\w+,\s{0,1}plural,\s*|(\=0|\=1|one|other){#*|[{}]|{+.*[A-Z]+_[A-Z]+.+}/g
+                    // let interpolationPattern = /{[A-Z]+_[A-Z]+[\s,]*}|{{.[^}]+}+|{\w+,\s{0,1}plural,\s*|(\=0|\=1|one|other){#*|[{}]/g;
+                    let interpolationPattern = /{\s?[a-zA-Z]+_[a-zA-Z]+[,\s]?|{{.[^}]+}+|plural,\s?|(\=0|\=1|one|other){#*|[{}]|plural\s?=\d/g;
 
 
                     let interpolationMatches = en.match(interpolationPattern);
                     if (interpolationMatches && !en.match(/@:/)) {
                         for (let match of interpolationMatches) {
                             let pattern = new RegExp(match, "g");
-                            en = en.replace(pattern, "<span class=\"interpolation\">"+match+"</span>");
+                            enPretty = enPretty.replace(pattern, "<span class=\"interpolation\">"+match+"</span>");
                         }
-                    }                  
+                    }
 
                     let row = translations_table_row_TEMPLATE.cloneNode(true);
+                    let translationTextarea = row.querySelector("textarea");
+                    let keyTD = row.querySelectorAll(".td")[0];
+                    let enTD = row.querySelectorAll(".td")[1];
+
                     row.removeAttribute("id");
                     row.classList.remove("template");
 
-                    row.querySelectorAll(".td")[0].innerHTML = key;
-                    row.querySelectorAll(".td")[1].innerHTML = en;
+
+                    keyTD.innerHTML = key;
+                    enTD.innerHTML = enPretty;
+                    enTD.setAttribute("plain-text-value", en);
 
                     if (key.match(commonKeyPattern)) {
                         translationsService().setCommonKey(key, en);
@@ -293,16 +337,33 @@ function translationsTableService () {
                     }
 
                     if (interpolationMatches) {
-                         row.querySelectorAll(".td")[1].setAttribute("interpolation", "");
+                         enTD.setAttribute("interpolation", interpolationMatches);
+                         enTD.innerHTML += `<div class="interpolation-warning">Highlighted text CANNOT be changed!</div>`;
+    
+                         translationTextarea.addEventListener("keyup", function () {
+                            let interpolationMatches = enTD.getAttribute("interpolation").split(",");
+                            console.log("interpolationMatches", interpolationMatches);
+                            let valueToCheck = this.value;
+                            for (let match of Array.from(interpolationMatches)){
+                                console.log("matching " + match + " against >>>", valueToCheck);
+                                if (valueToCheck.match(match)) {
+                                    valueToCheck = valueToCheck.replace(match, "");                                    
+                                } else if (!valueToCheck.match(match)) {
+                                    let imported_interpolation_value = translationsService().getImportedTranslations()[this.getAttribute("key")];
+                                    this.value = imported_interpolation_value;
+                                    this.parentNode.previousElementSibling.classList.remove("line-through");
+                                }
+                            }
+                         });
                     }
 
                     if (en.match(commonKeyPattern)) {
                         let commonVal = obj[en.substr(2)];
                         let commonKey = en;
-                        row.querySelectorAll(".td")[1].innerHTML += `<div class="common-value">${commonVal}</div>`;
+                        enTD.innerHTML += `<div class="common-value">${commonVal}</div>`;
                     }
 
-                    let translationTextarea = row.querySelector("textarea");
+
 
                     translationTextarea.setAttribute("key", key);
 
@@ -315,22 +376,22 @@ function translationsTableService () {
 
                     translationTextarea.addEventListener("click", function (e) {
                         let en = this.parentNode.parentNode.querySelectorAll(".td")[1];
-                        if (en.hasAttribute("interpolation")) {
+                        if (en.hasAttribute("interpolation") && this.value === "") {
                             let imported_interpolation_value = translationsService().getImportedTranslations()[this.getAttribute("key")];
                             this.value = imported_interpolation_value;
+                            this.parentNode.previousElementSibling.classList.remove("line-through");
                         }
                     });
 
                     translationTextarea.addEventListener("keyup", function (e) {
-
                         let key = e.keyCode || e.charCode;
                         if (key === 13) {
                             e.preventDefault();
                         }
-                        if (e.target.value != "") {
-                            e.target.parentNode.previousElementSibling.classList.add("line-through");
+                        if (this.value != "" && this.value != this.parentNode.previousElementSibling.getAttribute("plain-text-value")) {
+                            this.parentNode.previousElementSibling.classList.add("line-through");
                         } else {
-                            e.target.parentNode.previousElementSibling.classList.remove("line-through");
+                            this.parentNode.previousElementSibling.classList.remove("line-through");
                         }
                         translationsService().setTranslations(e);
                     });
@@ -343,7 +404,7 @@ function translationsTableService () {
 
             let rows = getRows();
             paginationService().setPages(rows);
-            
+
             console.log("END BUILD");
         },
         resize: () => {
@@ -357,7 +418,7 @@ function translationsTableService () {
                 }
                 tableRows.removeChild(child);
             }
-            paginationService().hideCtrls();            
+            paginationService().hideCtrls();
             setTableSize(data);
         }
     }
@@ -393,7 +454,7 @@ function alertService () {
     return {
         raise: (errorKey, options = {msg: "", type: ""}) => {
             let errorMsg = "";
-            let type = options.type || errorKey.split(".")[0];           
+            let type = options.type || errorKey.split(".")[0];
 
             if (errorKey === "CUSTOM") {
                 errorMsg = options.msg;
@@ -543,6 +604,7 @@ export default {
                     file_name.innerHTML = file.name;
 
                     translationsService().setImportedTranslations(textData);
+                    console.log(translationsService().SetTranslationsAsJSON(textData));
 
                     translationsService().setTextData(textData);
                     translationsService().pushFile(file);
@@ -553,12 +615,12 @@ export default {
 
                     let interval = setInterval(function(){
                         if (loadingService().isLoading()) {
-                            translationsTableService().build(textData);                           
+                            translationsTableService().build(textData);
                             clearInterval(interval);
                         }
-                    }, 1000);
+                    }, 10);
                 } else {
-                    alertService().raise("CUSTOM", {msg: checkValid.error, type: "ERROR"});
+                    alertService().raise("CUSTOM", {msg: `<i class="ion-md-warning">INVALID FILE.</i><div>${checkValid.error}</div>`, type: "ERROR"});
                 }
             }
             reader.readAsText(file);
