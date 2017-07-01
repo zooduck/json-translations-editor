@@ -111,6 +111,7 @@ const translationsService = (function(){
             setImportedTranslations: (data) => {
                 let obj = JSON.parse(data);
                 importedTranslations = obj;
+                setTranslationsAsJSON(data);
             },
             getImportedTranslations: () => {
                 return importedTranslations;
@@ -129,11 +130,15 @@ const translationsService = (function(){
                 } else {
                     delete translations[key];
                 }
-                console.log(setTranslationsAsJSON());
+                setTranslationsAsJSON();
                 return translations;
             },
             getTranslations: () => {
                 return translations;
+            },
+            getJSONTranslations: () => {
+                console.log("jsonTranslations", jsonTranslations);
+                return jsonTranslations;
             },
             setTextData: (data) => {
                 textData = data;
@@ -219,7 +224,7 @@ const paginationService = (function() {
 
                 let shutterInDelays = 100 * 11; // there is a 100ms compounded animation-delay on first 10 rows
                 setTimeout(function() {
-                   console.log(getPages());
+                   console.log("getPages()", getPages());
                    for (let collection of getPages().collections) {
                         for (let row of collection) {
                             row.classList.remove("shutter-in");
@@ -272,7 +277,28 @@ function translationsTableService () {
         let h = keys.length < 10 ? "auto" : `${space}px`;
         table_rows.style.height = h;
     };
-    return {
+    let checkInterpolationChanges = (e, valueToCheck, interpolationMatches) => {
+        for (let match of Array.from(interpolationMatches)){
+            console.log("matching " + match + " against >>>", valueToCheck);
+            let interpolationChanged = false;
+            if (valueToCheck.match(match)) {
+                valueToCheck = valueToCheck.replace(match, "");
+            } else if (!valueToCheck.match(match)) {
+                //alert("INTERPOLATION CHANGE DETECTED FOR: "+match);
+                
+                interpolationChanged = true;
+
+                //e.target.classList.add("interpolation-changed");
+
+                // let imported_interpolation_value = translationsService().getImportedTranslations()[e.target.getAttribute("key")];
+                // this.value = imported_interpolation_value;
+                // this.parentNode.previousElementSibling.classList.remove("line-through");
+            }
+            let type = interpolationChanged ? "add" : "remove";
+            e.target.classList[type]("interpolation-changed");           
+        }
+    };
+    return {       
         filter: (data) => {
             let pattern = new RegExp(data, "i");
             for (let child of Array.from(translations_table.querySelector(".table-rows").children)) {
@@ -338,22 +364,28 @@ function translationsTableService () {
 
                     if (interpolationMatches) {
                          enTD.setAttribute("interpolation", interpolationMatches);
-                         enTD.innerHTML += `<div class="interpolation-warning">Highlighted text CANNOT be changed!</div>`;
+                         enTD.innerHTML += `<div class="interpolation-warning">Text in red should NOT be changed</div>`;
 
-                         translationTextarea.addEventListener("keyup", function () {
-                            let interpolationMatches = enTD.getAttribute("interpolation").split(",");
-                            console.log("interpolationMatches", interpolationMatches);
+                         translationTextarea.addEventListener("keyup", function (e) {
+                            let interpolationMatches = enTD.getAttribute("interpolation").split(",");                           
                             let valueToCheck = this.value;
-                            for (let match of Array.from(interpolationMatches)){
-                                console.log("matching " + match + " against >>>", valueToCheck);
-                                if (valueToCheck.match(match)) {
-                                    valueToCheck = valueToCheck.replace(match, "");
-                                } else if (!valueToCheck.match(match)) {
-                                    let imported_interpolation_value = translationsService().getImportedTranslations()[this.getAttribute("key")];
-                                    this.value = imported_interpolation_value;
-                                    this.parentNode.previousElementSibling.classList.remove("line-through");
-                                }
-                            }
+
+                            console.log("interpolationMatches", interpolationMatches);
+
+                            checkInterpolationChanges(e, valueToCheck, interpolationMatches);
+
+
+                            // for (let match of Array.from(interpolationMatches)){
+                            //     console.log("matching " + match + " against >>>", valueToCheck);
+                            //     if (valueToCheck.match(match)) {
+                            //         valueToCheck = valueToCheck.replace(match, "");
+                            //     } else if (!valueToCheck.match(match)) {
+                            //         let imported_interpolation_value = translationsService().getImportedTranslations()[this.getAttribute("key")];
+                            //         this.value = imported_interpolation_value;
+                            //         this.parentNode.previousElementSibling.classList.remove("line-through");
+                            //     }
+                            // }
+
                          });
                     }
 
@@ -392,6 +424,8 @@ function translationsTableService () {
                             this.parentNode.previousElementSibling.classList.remove("line-through");
                         }
                         translationsService().setTranslations(e);
+                        localStorageService().setLocalStorage();
+                        console.log(localStorageService().getLocalStorage());
                     });
 
                     //addRow(row, delay);
@@ -577,6 +611,43 @@ const loadingService = (function(){
     }
 })();
 
+const fileService = (function () {
+    let file = null;
+    return function () {
+       return {
+            setFile(data) {
+                file = data;
+                console.log("file", file);
+            },
+            getFile() {
+                console.log("file", file);
+                return file;
+            }
+        }
+    }
+})();
+
+const localStorageService = (function () {
+    let localStorage = {}
+    return function () {
+        return {
+           setLocalStorage: () => {
+                //console.log("translationsService().getJSONTranslations()", translationsService().getJSONTranslations());
+                localStorage["translationsTable"] = translationsService().getJSONTranslations();
+                localStorage["translations"] = translationsService().getTranslations();
+                localStorage["file"] = fileService().getFile();
+                console.log("localStorage", localStorage);
+            },
+            getLocalStorage: () => {
+                return localStorage;
+            },
+            clearLocalStorage: () => {
+
+            } 
+        }
+    }
+})();
+
 export default {
     log() {
         console.log("services.js log() method called");
@@ -599,9 +670,15 @@ export default {
                 let checkValid = isValidJSON(textData);
                 if (checkValid.valid) {
 
-                    file_name.innerHTML = file.name;
+                    fileService().setFile(file);
+                   
+                    
+                    file_name.innerHTML = fileService().getFile().name;
 
                     translationsService().setImportedTranslations(textData);
+
+                    localStorageService().setLocalStorage();
+                    
                     console.log(translationsService().SetTranslationsAsJSON(textData));
 
                     translationsService().setTextData(textData);
