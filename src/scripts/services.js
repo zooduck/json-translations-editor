@@ -104,7 +104,7 @@ const translationsService = (function(){
         for (let key in translations) {
             obj[key] = translations[key];
         }
-        return jsonTranslations = JSON.stringify(obj, null, 4);        
+        return Object.keys(translations).length > 0 ? jsonTranslations = JSON.stringify(obj, null, 4) : jsonTranslations = JSON.stringify(importedTranslations, null, 4);
     }
     return function () {
         return {
@@ -162,7 +162,7 @@ const translationsService = (function(){
                     let file = window.URL.createObjectURL(textData);
                     link.href = file;
 
-                    console.log("output: ", textData); 
+                    console.log("output: ", textData);
                 }
             },
             pushFile: (file) => {
@@ -311,7 +311,7 @@ function translationsTableService () {
                     if (interpolationMatches && !en.match(/@:/)) {
                         for (let match of interpolationMatches) {
                             let pattern = new RegExp(match, "g");
-                            enPretty = enPretty.replace(pattern, "<span class=\"interpolation\">"+match+"</span>");
+                            enPretty = enPretty.replace(pattern, `<span class=\"interpolation\">${match}</span>`);
                         }
                     }
 
@@ -339,7 +339,7 @@ function translationsTableService () {
                     if (interpolationMatches) {
                          enTD.setAttribute("interpolation", interpolationMatches);
                          enTD.innerHTML += `<div class="interpolation-warning">Highlighted text CANNOT be changed!</div>`;
-    
+
                          translationTextarea.addEventListener("keyup", function () {
                             let interpolationMatches = enTD.getAttribute("interpolation").split(",");
                             console.log("interpolationMatches", interpolationMatches);
@@ -347,7 +347,7 @@ function translationsTableService () {
                             for (let match of Array.from(interpolationMatches)){
                                 console.log("matching " + match + " against >>>", valueToCheck);
                                 if (valueToCheck.match(match)) {
-                                    valueToCheck = valueToCheck.replace(match, "");                                    
+                                    valueToCheck = valueToCheck.replace(match, "");
                                 } else if (!valueToCheck.match(match)) {
                                     let imported_interpolation_value = translationsService().getImportedTranslations()[this.getAttribute("key")];
                                     this.value = imported_interpolation_value;
@@ -362,8 +362,6 @@ function translationsTableService () {
                         let commonKey = en;
                         enTD.innerHTML += `<div class="common-value">${commonVal}</div>`;
                     }
-
-
 
                     translationTextarea.setAttribute("key", key);
 
