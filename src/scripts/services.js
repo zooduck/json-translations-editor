@@ -106,6 +106,12 @@ const translationsService = (function(){
         }
         return Object.keys(translations).length > 0 ? jsonTranslations = JSON.stringify(obj, null, 4) : jsonTranslations = JSON.stringify(importedTranslations, null, 4);
     }
+    const updateImportedTranslations = () => {
+        for (let key in translations) {
+            importedTranslations[key] = translations[key];
+        }
+        console.log("importedTranslations", importedTranslations);
+    };
     return function () {
         return {
             setImportedTranslations: (data) => {
@@ -125,11 +131,18 @@ const translationsService = (function(){
 
                 syncCommonKeyValues(key, val);
 
+                // ensure COMMON key translation values are prefixed with "@:"
+                // (this allows easy copy paste from key in table)
+                if (val.match(/^COMMON\./)) {
+                    val = `@:${val}`;
+                }
+
                 if (val !== "") {
                     translations[key] = val;
                 } else {
                     delete translations[key];
-                }
+                }                
+                updateImportedTranslations();
                 setTranslationsAsJSON();
                 return translations;
             },
@@ -284,8 +297,9 @@ function translationsTableService () {
             if (valueToCheck.match(match)) {
                 valueToCheck = valueToCheck.replace(match, "");
             } else if (!valueToCheck.match(match)) {
+               
                 //alert("INTERPOLATION CHANGE DETECTED FOR: "+match);
-                
+
                 interpolationChanged = true;
 
                 //e.target.classList.add("interpolation-changed");
@@ -295,10 +309,10 @@ function translationsTableService () {
                 // this.parentNode.previousElementSibling.classList.remove("line-through");
             }
             let type = interpolationChanged ? "add" : "remove";
-            e.target.classList[type]("interpolation-changed");           
+            e.target.classList[type]("interpolation-changed");
         }
     };
-    return {       
+    return {
         filter: (data) => {
             let pattern = new RegExp(data, "i");
             for (let child of Array.from(translations_table.querySelector(".table-rows").children)) {
@@ -350,8 +364,8 @@ function translationsTableService () {
                     row.classList.remove("template");
 
 
-                    keyTD.innerHTML = key;
-                    enTD.innerHTML = enPretty;
+                    keyTD.innerHTML = `<span>${key}</span>`;
+                    enTD.innerHTML = `<span>${enPretty}</span>`;
                     enTD.setAttribute("plain-text-value", en);
 
                     if (key.match(commonKeyPattern)) {
@@ -367,25 +381,13 @@ function translationsTableService () {
                          enTD.innerHTML += `<div class="interpolation-warning">Text in red should NOT be changed</div>`;
 
                          translationTextarea.addEventListener("keyup", function (e) {
-                            let interpolationMatches = enTD.getAttribute("interpolation").split(",");                           
+                            let interpolationMatches = enTD.getAttribute("interpolation").split(",");
                             let valueToCheck = this.value;
 
                             console.log("interpolationMatches", interpolationMatches);
 
                             checkInterpolationChanges(e, valueToCheck, interpolationMatches);
-
-
-                            // for (let match of Array.from(interpolationMatches)){
-                            //     console.log("matching " + match + " against >>>", valueToCheck);
-                            //     if (valueToCheck.match(match)) {
-                            //         valueToCheck = valueToCheck.replace(match, "");
-                            //     } else if (!valueToCheck.match(match)) {
-                            //         let imported_interpolation_value = translationsService().getImportedTranslations()[this.getAttribute("key")];
-                            //         this.value = imported_interpolation_value;
-                            //         this.parentNode.previousElementSibling.classList.remove("line-through");
-                            //     }
-                            // }
-
+         
                          });
                     }
 
@@ -426,6 +428,12 @@ function translationsTableService () {
                         translationsService().setTranslations(e);
                         localStorageService().setLocalStorage();
                         console.log(localStorageService().getLocalStorage());
+                    });
+
+                    translationTextarea.addEventListener("change", function (e) {
+                        translationsService().setTranslations(e);
+                        localStorageService().setLocalStorage();
+                        console.log("changed: ", this.value);
                     });
 
                     //addRow(row, delay);
@@ -628,22 +636,36 @@ const fileService = (function () {
 })();
 
 const localStorageService = (function () {
-    let localStorage = {}
+    let localStorageObj = {}
     return function () {
         return {
            setLocalStorage: () => {
-                //console.log("translationsService().getJSONTranslations()", translationsService().getJSONTranslations());
-                localStorage["translationsTable"] = translationsService().getJSONTranslations();
-                localStorage["translations"] = translationsService().getTranslations();
-                localStorage["file"] = fileService().getFile();
+                //localStorageObj["translationsTable"] = translationsService().getJSONTranslations();
+                localStorageObj["importedTranslations"] = JSON.stringify(translationsService().getImportedTranslations(), null, 4);
+                localStorageObj["translations"] = JSON.stringify(translationsService().getTranslations(), null, 4);
+                if (fileService().getFile()) {
+                    localStorageObj["fileName"] = fileService().getFile().name;
+                }
+                //localStorageObj["fileName"] = fileService().getFile() ? fileService.getFile().name : ; 
+
+                for (let key in localStorageObj) {
+                    localStorage.setItem(`jsonTranslationsEditor_${key}`, localStorageObj[key]);
+                }
+
+                // localStorage.setItem("jsonTranslationsEditor", localStorageObj);                         
+                
+                // localStorage.setItem("translationsTable", translationsService().getJSONTranslations());
+                // localStorage.setItem("translations", JSON.stringify(translationsService().getTranslations(), null, 4));
+                // localStorage.setItem("fileName", fileService().getFile().name);
+                
                 console.log("localStorage", localStorage);
             },
             getLocalStorage: () => {
                 return localStorage;
             },
             clearLocalStorage: () => {
-
-            } 
+                return localStorage.clear();
+            }
         }
     }
 })();
@@ -671,15 +693,15 @@ export default {
                 if (checkValid.valid) {
 
                     fileService().setFile(file);
-                   
-                    
+
+
                     file_name.innerHTML = fileService().getFile().name;
 
                     translationsService().setImportedTranslations(textData);
 
                     localStorageService().setLocalStorage();
-                    
-                    console.log(translationsService().SetTranslationsAsJSON(textData));
+
+                    translationsService().SetTranslationsAsJSON(textData);
 
                     translationsService().setTextData(textData);
                     translationsService().pushFile(file);
@@ -712,5 +734,34 @@ export default {
     },
     PaginationService() {
         return paginationService();
+    },
+    init() {
+
+        console.log(localStorageService().getLocalStorage());
+
+        if (localStorageService().getLocalStorage()["jsonTranslationsEditor_importedTranslations"]) {
+          
+
+            loadingService().setLoading();
+
+
+            let localStorageData = localStorageService().getLocalStorage();
+           
+            let textData = localStorageData["jsonTranslationsEditor_importedTranslations"];
+            let fileName = localStorageData["jsonTranslationsEditor_fileName"];
+
+            malenkyFileService().build(textData, fileName);
+
+            translationsService().setImportedTranslations(textData);
+
+            translationsTableService().init(textData);
+
+            let interval = setInterval(function(){
+                if (loadingService().isLoading()) {
+                    translationsTableService().build(textData);
+                    clearInterval(interval);
+                }
+            }, 10);
+        }
     }
 }

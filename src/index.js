@@ -4,6 +4,8 @@ import Services from "./scripts/services.js";
 Services.log();
 Services.es6BabelTest();
 
+Services.init();
+
 const file_input = document.getElementById("file");
 file_input.addEventListener("change", Services.FileHandler);
 
