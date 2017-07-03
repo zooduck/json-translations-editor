@@ -1,7 +1,8 @@
 import flat from "flat";
 
-const thumbnail_file = document.getElementById("thumbnailFile");
-const progress = document.getElementById("progress");
+// const thumbnail_file = document.getElementById("thumbnailFile");
+// const progress = document.getElementById("progress");
+
 const translations_table = document.getElementById("translationsTable");
 const table_rows = translations_table.querySelector(".table-rows");
 const translations_table_row_TEMPLATE = document.getElementById("translationsTableRow_TEMPLATE");
@@ -40,32 +41,32 @@ function buildMalenkyFile (fileName, txt, delay = 0) {
     }, delay);
 }
 
-function textShuffle(txt) {
-    let chars = txt.substr(0, 1000).split("");
-    let newChars = [];
-    for (let i = 0, l = chars.length; i < l; i++) {
-        let rand = Math.floor(Math.random() * l);
-        newChars.push(chars[rand]);
-    }
-    return newChars.join(" ");
-}
+// function textShuffle(txt) {
+//     let chars = txt.substr(0, 1000).split("");
+//     let newChars = [];
+//     for (let i = 0, l = chars.length; i < l; i++) {
+//         let rand = Math.floor(Math.random() * l);
+//         newChars.push(chars[rand]);
+//     }
+//     return newChars.join(" ");
+// }
 
-function applyShuffledText (txt, el, delay, totalDelay) {
-    setTimeout(function(){
-        el.innerHTML = txt;
-        setProgress(`${(delay / totalDelay) * 100}%`);
-    }, delay);
-}
+// function applyShuffledText (txt, el, delay, totalDelay) {
+//     setTimeout(function(){
+//         el.innerHTML = txt;
+//         setProgress(`${(delay / totalDelay) * 100}%`);
+//     }, delay);
+// }
 
-function setProgress (percent = "0%") {
-    progress.querySelector(".progress-bar").style.width = percent;
-    let pretext = parseInt(percent) < 50? "Reading file..." : "Converting...";
-    if (parseInt(percent) >= 100) {
-        progress.querySelector(".before").innerHTML = "Done!";
-    } else {
-        progress.querySelector(".before").innerHTML = `${pretext} ${Math.floor(parseInt(percent))}%`;
-    }
-}
+// function setProgress (percent = "0%") {
+//     progress.querySelector(".progress-bar").style.width = percent;
+//     let pretext = parseInt(percent) < 50? "Reading file..." : "Converting...";
+//     if (parseInt(percent) >= 100) {
+//         progress.querySelector(".before").innerHTML = "Done!";
+//     } else {
+//         progress.querySelector(".before").innerHTML = `${pretext} ${Math.floor(parseInt(percent))}%`;
+//     }
+// }
 
 const translationsService = (function(){
     let importedTranslations = {} // stores data imported from a file
@@ -84,14 +85,12 @@ const translationsService = (function(){
     };
     let syncCommonKeyValues = (key, val) => {
         let commonKeyPattern = /^COMMON\./;
-        let pattern = new RegExp(`${key}</span>`);
-        console.log("pattern", pattern);
+        let pattern = new RegExp(`${key}</span>`);       
         if (key.match(commonKeyPattern)) {
             // update all hints relating to this key
             for (let row of Array.from(table_rows.children)) {
                 let en = row.querySelectorAll(".td")[1];
-                if (en.hasAttribute("common-key")) {
-                    console.log(en.innerHTML + " vs " + pattern);
+                if (en.hasAttribute("common-key")) {                   
                     if (en.innerHTML.match(pattern)) {
                         let hint = en.querySelector(".common-value");
                         if (val && hint) {
@@ -104,17 +103,17 @@ const translationsService = (function(){
             }
         }
     };
-    const setTranslationsAsJSON = (data = null) => {
-        if (data) { // init
-            return jsonTranslations = data;
-        }
-        // update
-        let obj = JSON.parse(jsonTranslations);
-        for (let key in translations) {
-            obj[key] = translations[key];
-        }
-        return Object.keys(translations).length > 0 ? jsonTranslations = JSON.stringify(obj, null, 4) : jsonTranslations = JSON.stringify(importedTranslations, null, 4);
-    }
+    // const setTranslationsAsJSON = (data = null) => {
+    //     if (data) { // init
+    //         return jsonTranslations = data;
+    //     }
+    //     // update
+    //     let obj = JSON.parse(jsonTranslations);
+    //     for (let key in translations) {
+    //         obj[key] = translations[key];
+    //     }
+    //     return Object.keys(translations).length > 0 ? jsonTranslations = JSON.stringify(obj, null, 4) : jsonTranslations = JSON.stringify(importedTranslations, null, 4);
+    // }
     const updateExportedTranslations = () => {
         for (let key in translations) {
             //importedTranslations[key] = translations[key];
@@ -130,7 +129,7 @@ const translationsService = (function(){
                 let obj = JSON.parse(data);
                 importedTranslations = obj;
                 console.log("importedTranslations after setImportedTranslations =>", importedTranslations);
-                setTranslationsAsJSON(data);
+                // setTranslationsAsJSON(data);
             },
             setExportedTranslations: (data) => {
                 let obj = JSON.parse(data);
@@ -142,9 +141,9 @@ const translationsService = (function(){
             getExportedTranslations: () => {
                 return exportedTranslations;
             },
-            SetTranslationsAsJSON: (data) => {
-                return setTranslationsAsJSON(data);
-            },
+            // SetTranslationsAsJSON: (data) => {
+            //     return setTranslationsAsJSON(data);
+            // },
             SyncCommonKeyValues: (key, val) => {
                 return syncCommonKeyValues(key, val);
             },
@@ -192,17 +191,17 @@ const translationsService = (function(){
                 }
 
                 updateExportedTranslations();
-                setTranslationsAsJSON();
+                // setTranslationsAsJSON();
 
                 return translations;
             },
             getTranslations: () => {
                 return translations;
             },
-            getJSONTranslations: () => {
-                console.log("jsonTranslations", jsonTranslations);
-                return jsonTranslations;
-            },
+            // getJSONTranslations: () => {
+            //     console.log("jsonTranslations", jsonTranslations);
+            //     return jsonTranslations;
+            // },
             setTextData: (data) => {
                 textData = data;
             },
@@ -213,21 +212,26 @@ const translationsService = (function(){
                 commonKeys[key] = val;
             },
             saveJSON: (link) => {
-                if (link) {
+                if (link) {                    
+                    let fileName = fileService().getFileName().split(".")[0];
+                    let fileExt = fileService().getFileName().split(".")[1];
                     let jsonData = JSON.stringify(flat.unflatten(translations), null, 4);
                     let textData = new Blob([jsonData], {type: "text/plain"});
                     let file = window.URL.createObjectURL(textData);
-                    link.download = `${getFiles()[0].name}_EDIT.${getFiles()[0].ext}`;
+                    link.download = `${fileName}_EDIT.${fileExt}`;
                     link.href = file;
 
                     console.log("output: ", jsonData);
                 }
             },
-            saveProgress: (link) => {
+            saveProgress: (link) => {                
                 if (link) {
-                    let textData = new Blob([jsonTranslations], {type: "text/plain"});
-                    link.download = `test.json`;
+                    let fileName = fileService().getFileName().split(".")[0];
+                    let fileExt = fileService().getFileName().split(".")[1];
+                    let jsonData = JSON.stringify(exportedTranslations, null, 4);
+                    let textData = new Blob([jsonData], {type: "text/plain"});
                     let file = window.URL.createObjectURL(textData);
+                    link.download = `${fileName}_WORK_IN_PROGRESS.${fileExt}`;
                     link.href = file;
 
                     console.log("output: ", textData);
@@ -748,6 +752,12 @@ const fileService = (function () {
             getFile() {
                 console.log("file", file);
                 return file;
+            },
+            getFileName() {
+                if (file) {
+                    return file.name;
+                }
+                return localStorage.getItem("jsonTranslationsEditor_fileName");
             }
         }
     }

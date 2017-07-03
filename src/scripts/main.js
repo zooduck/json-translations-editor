@@ -12,13 +12,13 @@ const pagination_ctrls = document.getElementById("paginationCtrls");
 save_progress_ctrl.addEventListener("mouseenter", function (e) {
 	Services.TranslationsService().setTranslations();
 	Services.LocalStorageService().setLocalStorage();
-	console.log("localStorage:", Services.LocalStorageService().getLocalStorage());
+	// console.log("localStorage:", Services.LocalStorageService().getLocalStorage());
 });
 
 export_translations_ctrl.addEventListener("mouseenter", function (e) {
 	Services.TranslationsService().setTranslations();
 	Services.LocalStorageService().setLocalStorage();
-	console.log("localStorage:", Services.LocalStorageService().getLocalStorage());
+	// console.log("localStorage:", Services.LocalStorageService().getLocalStorage());
 });                        
 
 file_input.addEventListener("change", Services.FileHandler);
@@ -26,6 +26,11 @@ file_input.addEventListener("change", Services.FileHandler);
 export_translations_ctrl.addEventListener("click", function () {
 	Services.TranslationsService().saveJSON(this);
 });
+
+save_progress_ctrl.addEventListener("click", function () {
+	Services.TranslationsService().saveProgress(this);
+});
+
 
 searchTable.addEventListener("keyup", function () {
 	Services.TranslationsTableService().filter(this.value);
