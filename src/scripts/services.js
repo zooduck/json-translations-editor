@@ -17,6 +17,8 @@ const pagination_ctrls = document.getElementById("paginationCtrls");
 
 const alert_screen = document.getElementById("alertScreen");
 const alert_box = document.getElementById("alertBox");
+const alert_confirm_ctrl_cancel = document.getElementById("alertConfirmCtrlCancel");
+const alert_confirm_ctrl_ok = document.getElementById("alertConfirmCtrlOK");
 
 
 
@@ -127,11 +129,11 @@ const translationsService = (function(){
                 // this gets called only when a file is uploaded
                 let obj = JSON.parse(data);
                 importedTranslations = obj;
-                console.log("importedTranslations after setImportedTranslations =>", importedTranslations);                
+                console.log("importedTranslations after setImportedTranslations =>", importedTranslations);
                 setTranslationsAsJSON(data);
             },
             setExportedTranslations: (data) => {
-                let obj = JSON.parse(data);                
+                let obj = JSON.parse(data);
                 exportedTranslations = obj;
             },
             getImportedTranslations: () => {
@@ -143,7 +145,7 @@ const translationsService = (function(){
             SetTranslationsAsJSON: (data) => {
                 return setTranslationsAsJSON(data);
             },
-            SyncCommonKeyValues: (key, val) => {                
+            SyncCommonKeyValues: (key, val) => {
                 return syncCommonKeyValues(key, val);
             },
             // setTranslations: (e) => {
@@ -163,7 +165,7 @@ const translationsService = (function(){
             //         translations[key] = val;
             //     } else {
             //         delete translations[key];
-            //     }                
+            //     }
             //     updateExportedTranslations();
             //     setTranslationsAsJSON();
             //     return translations;
@@ -192,7 +194,7 @@ const translationsService = (function(){
                 updateExportedTranslations();
                 setTranslationsAsJSON();
 
-                return translations;               
+                return translations;
             },
             getTranslations: () => {
                 return translations;
@@ -345,21 +347,21 @@ function translationsTableService () {
         table_rows.style.height = h;
     };
     let checkInterpolationChanges = (e, valueToCheck, interpolationMatches) => {
-        
+
         if (valueToCheck == "") {
             e.target.classList.remove("interpolation-changed");
             return
         }
-       
+
         let interpolationChanged = false;
         for (let match of Array.from(interpolationMatches)){
-            
+
             console.log("matching " + match + " against >>>", valueToCheck);
-            
+
             if (valueToCheck.match(match)) {
                 valueToCheck = valueToCheck.replace(match, "");
             } else if (!valueToCheck.match(match)) {
-               
+
                 //alert("INTERPOLATION CHANGE DETECTED FOR: "+match);
 
                 interpolationChanged = true;
@@ -370,7 +372,7 @@ function translationsTableService () {
                 // let imported_interpolation_value = translationsService().getImportedTranslations()[e.target.getAttribute("key")];
                 // this.value = imported_interpolation_value;
                 // this.parentNode.previousElementSibling.classList.remove("line-through");
-            }            
+            }
         }
 
         let type = interpolationChanged ? "add" : "remove";
@@ -445,9 +447,9 @@ function translationsTableService () {
                          enTD.innerHTML += `<div class="interpolation-warning">Text in red should NOT be changed</div>`;
 
                          translationTextarea.addEventListener("keyup", function (e) {
-                            
+
                             let keyPressed = e.keyCode || e.charCode;
-                           
+
                             console.log("e.target.value", e.target.value);
 
                             let interpolationMatches = enTD.getAttribute("interpolation").split(",");
@@ -455,10 +457,10 @@ function translationsTableService () {
 
                             console.log("interpolationMatches", interpolationMatches);
 
-                         
+
                             checkInterpolationChanges(e, valueToCheck, interpolationMatches);
 
-         
+
                          });
                     }
 
@@ -490,7 +492,7 @@ function translationsTableService () {
                         let keyPressed = e.keyCode || e.charCode;
                         let keyAttr = this.getAttribute("key");
                         let val = this.value;
-                        
+
                         if (keyPressed === 13) {
                             e.preventDefault();
                             return
@@ -504,7 +506,7 @@ function translationsTableService () {
 
                         translationsService().SyncCommonKeyValues(keyAttr, val);
 
-                        
+
 
                         // ####################################################################################
                         // THIS HAS NOW BEEN MOVED TO MOUSEENTER EVENTS ON THE SAVE AND DOWNLOAD BUTTONS
@@ -513,7 +515,7 @@ function translationsTableService () {
 
                         // translationsService().setTranslations();
                         // localStorageService().setLocalStorage();
-                        
+
                         // console.log(localStorageService().getLocalStorage());
 
                         // ####################################################################################
@@ -591,10 +593,12 @@ function alertService () {
                 errorMsg = errorService().getMsg(errorKey);
             }
 
-            alert_screen.querySelector(".alert-msg").innerHTML = errorMsg;
+            //alert_screen.querySelector(".alert-msg").innerHTML = errorMsg;
             alert_box.classList.remove("pop", "error", "success");
 
             alert_box.querySelector(".alert-msg").innerHTML = errorMsg;
+
+            alert_confirm_ctrl_cancel.classList.add("hidden");
 
 
             // alert_bar.querySelector("h2").innerHTML = errorMsg;
@@ -621,6 +625,31 @@ function alertService () {
         dismiss: () => {
             alert_screen.classList.remove("active");
             alert_box.classList.remove("pop", "error", "success");
+        }
+    }
+}
+
+function confirmService () {
+    return {
+        raise: (msg, resolve, reject) => {          
+            
+            alert_box.classList.remove("pop", "error", "success");
+            alert_box.querySelector(".alert-msg").innerHTML = msg;            
+            
+            alert_confirm_ctrl_cancel.classList.remove("hidden");
+
+            alert_confirm_ctrl_ok.onclick = function () {
+                alertService().dismiss();
+                resolve();
+            };
+
+            alert_confirm_ctrl_cancel.onclick = function () {
+                alertService().dismiss();
+                reject();
+            };
+
+            alert_screen.classList.add("active");
+            alert_box.classList.add("pop");
         }
     }
 }
@@ -733,22 +762,22 @@ const localStorageService = (function () {
                 localStorageObj["exportedTranslations"] = JSON.stringify(translationsService().getExportedTranslations(), null, 4);
                 localStorageObj["importedTranslations"] = JSON.stringify(translationsService().getImportedTranslations(), null, 4);
                 localStorageObj["translations"] = JSON.stringify(translationsService().getTranslations(), null, 4);
-                
+
                 if (fileService().getFile()) {
                     localStorageObj["fileName"] = fileService().getFile().name;
                 }
-                //localStorageObj["fileName"] = fileService().getFile() ? fileService.getFile().name : ; 
+                //localStorageObj["fileName"] = fileService().getFile() ? fileService.getFile().name : ;
 
                 for (let key in localStorageObj) {
                     localStorage.setItem(`jsonTranslationsEditor_${key}`, localStorageObj[key]);
                 }
 
-                // localStorage.setItem("jsonTranslationsEditor", localStorageObj);                         
-                
+                // localStorage.setItem("jsonTranslationsEditor", localStorageObj);
+
                 // localStorage.setItem("translationsTable", translationsService().getJSONTranslations());
                 // localStorage.setItem("translations", JSON.stringify(translationsService().getTranslations(), null, 4));
                 // localStorage.setItem("fileName", fileService().getFile().name);
-                
+
                 console.log("localStorage", localStorage);
             },
             getLocalStorage: () => {
@@ -765,6 +794,16 @@ const localStorageService = (function () {
         }
     }
 })();
+
+// let testService = function (resolver) {
+//       let button = document.createElement("button");
+//         button.style.fontSize = "50px";
+//         button.innerHTML = "CLICK";
+//         button.onclick = function () {
+//             resolver();
+//         }
+//         document.body.appendChild(button);
+// }
 
 export default {
     log() {
@@ -795,11 +834,7 @@ export default {
                     translationsService().setImportedTranslations(textData);
                     translationsService().setExportedTranslations(textData);
 
-                    localStorageService().clear();
-
-                    console.log("localStorage after clear():", localStorage);
-
-                    // return;
+                    localStorageService().clear();                   
 
                     localStorageService().setLocalStorage();
 
@@ -819,7 +854,7 @@ export default {
                         }
                     }, 10);
                 } else {
-                    alertService().raise("CUSTOM", {msg: `<i class="ion-md-warning">INVALID FILE.</i><div>${checkValid.error}</div>`, type: "ERROR"});
+                    alertService().raise("CUSTOM", {msg: `<i class="ion-md-warning">INVALID FILE!</i><div>${checkValid.error}</div>`, type: "ERROR"});
                 }
             }
             reader.readAsText(file);
@@ -845,30 +880,40 @@ export default {
         console.log("init() localStorage:", localStorageService().getLocalStorage());
 
         if (localStorageService().getLocalStorage()["jsonTranslationsEditor_exportedTranslations"]) {
-          
 
-            loadingService().setLoading();
+            let promise = new Promise(function (resolve, reject) {
+                confirmService().raise("Do you want to load data from your last session?", resolve, reject);
+            });  
 
 
-            let localStorageData = localStorageService().getLocalStorage();
-           
-            let importedTranslations = localStorageData["jsonTranslationsEditor_importedTranslations"];
-            let exportedTranslations = localStorageData["jsonTranslationsEditor_exportedTranslations"];
-            let fileName = localStorageData["jsonTranslationsEditor_fileName"];
+            promise.then(function (result) {
 
-            malenkyFileService().build(exportedTranslations, fileName);
+                loadingService().setLoading();
 
-            translationsService().setImportedTranslations(importedTranslations);
-            translationsService().setExportedTranslations(exportedTranslations);
+                let localStorageData = localStorageService().getLocalStorage();
 
-            translationsTableService().init(exportedTranslations);
+                let importedTranslations = localStorageData["jsonTranslationsEditor_importedTranslations"];
+                let exportedTranslations = localStorageData["jsonTranslationsEditor_exportedTranslations"];
+                let fileName = localStorageData["jsonTranslationsEditor_fileName"];
 
-            let interval = setInterval(function(){
-                if (loadingService().isLoading()) {
-                    translationsTableService().build(exportedTranslations);
-                    clearInterval(interval);
-                }
-            }, 10);
+                malenkyFileService().build(exportedTranslations, fileName);
+
+                translationsService().setImportedTranslations(importedTranslations);
+                translationsService().setExportedTranslations(exportedTranslations);
+
+                translationsTableService().init(exportedTranslations);
+
+                let interval = setInterval(function(){
+                    if (loadingService().isLoading()) {
+                        translationsTableService().build(exportedTranslations);
+                        clearInterval(interval);
+                    }
+                }, 10);
+
+            }, function (reject) {
+              // do nothing
+            });
+
         }
     }
 }

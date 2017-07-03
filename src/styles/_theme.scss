@@ -215,6 +215,8 @@ button {
 .alert-box {
 	display: flex;
 	justify-content: space-between;
+	flex-direction: column;
+
 	width: 350px;
 	min-height: 150px;
 	background: #ccc;
@@ -230,9 +232,10 @@ button {
 		i {
 			color: #fff;
 			margin-right: 5px;
+			font-style: normal;
 
 			&:before {
-				margin-right: 5px;
+				margin-right: 10px;				
 			}
 
 			&:hover {
@@ -253,9 +256,25 @@ button {
 		font-size: 1.3em;
 	}
 
-	.alert-confirm-ctrl {
-		align-self: flex-end;
+	.alert-ctrls {
+		display: flex;
+		justify-content: space-between;
+
+		.alert-confirm-ctrl {
+			&.cancel {
+				border: solid 2px cornflowerblue;
+				background: #fff;
+				color: cornflowerblue;
+			}
+			&.hidden {
+				visibility: hidden;
+			}
+		}
 	}
+
+	// .alert-confirm-ctrl {
+	// 	align-self: flex-end;
+	// }
 }
 
 .import-prompt {
