@@ -9,27 +9,33 @@ const searchTable = document.getElementById("searchTable");
 const alert_confirm_ctrl = document.getElementById("alertBox").querySelector(".alert-confirm-ctrl");
 const pagination_ctrls = document.getElementById("paginationCtrls");
 
-save_progress_ctrl.addEventListener("mouseenter", function (e) {
-	Services.TranslationsService().setTranslations();
-	Services.LocalStorageService().setLocalStorage();
-	// console.log("localStorage:", Services.LocalStorageService().getLocalStorage());
-});
+// save_progress_ctrl.addEventListener("mouseenter", function (e) {
+// 	Services.TranslationsService().setTranslations();
+// 	Services.LocalStorageService().setLocalStorage();
+// 	// console.log("localStorage:", Services.LocalStorageService().getLocalStorage());
+// });
 
-export_translations_ctrl.addEventListener("mouseenter", function (e) {
-	Services.TranslationsService().setTranslations();
-	Services.LocalStorageService().setLocalStorage();
-	// console.log("localStorage:", Services.LocalStorageService().getLocalStorage());
-});                        
-
-file_input.addEventListener("change", Services.FileHandler);
+// export_translations_ctrl.addEventListener("mouseenter", function (e) {
+// 	Services.TranslationsService().setTranslations();
+// 	Services.LocalStorageService().setLocalStorage();
+// 	// console.log("localStorage:", Services.LocalStorageService().getLocalStorage());
+// });
 
 export_translations_ctrl.addEventListener("click", function () {
+	Services.TranslationsService().setTranslations();
+	Services.LocalStorageService().setLocalStorage();
 	Services.TranslationsService().saveJSON(this);
 });
 
 save_progress_ctrl.addEventListener("click", function () {
+	Services.TranslationsService().setTranslations();
+	Services.LocalStorageService().setLocalStorage();
 	Services.TranslationsService().saveProgress(this);
 });
+
+file_input.addEventListener("change", Services.FileHandler);
+
+
 
 
 searchTable.addEventListener("keyup", function () {
