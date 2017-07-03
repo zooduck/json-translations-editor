@@ -19,6 +19,8 @@ const alert_screen = document.getElementById("alertScreen");
 const alert_box = document.getElementById("alertBox");
 
 
+
+
 function buildMalenkyFile (fileName, txt, delay = 0) {
 
     paper_title.innerHTML = "";
@@ -64,8 +66,10 @@ function setProgress (percent = "0%") {
 }
 
 const translationsService = (function(){
-    let importedTranslations = {}
+    let importedTranslations = {} // stores data imported from a file
+    let exportedTranslations = {} // stores a copy of the imported translations along with changes (for restoring the previous session from localStorage)
     let translations = {}
+    let translationsCompared = {}
     let jsonTranslations = "{}";
     let commonKeys = {}
     let textData = "";
@@ -78,12 +82,15 @@ const translationsService = (function(){
     };
     let syncCommonKeyValues = (key, val) => {
         let commonKeyPattern = /^COMMON\./;
+        let pattern = new RegExp(`${key}</span>`);
+        console.log("pattern", pattern);
         if (key.match(commonKeyPattern)) {
             // update all hints relating to this key
             for (let row of Array.from(table_rows.children)) {
                 let en = row.querySelectorAll(".td")[1];
                 if (en.hasAttribute("common-key")) {
-                    if (en.innerHTML.match(key)) {
+                    console.log(en.innerHTML + " vs " + pattern);
+                    if (en.innerHTML.match(pattern)) {
                         let hint = en.querySelector(".common-value");
                         if (val && hint) {
                             hint.innerHTML = val;
@@ -106,45 +113,86 @@ const translationsService = (function(){
         }
         return Object.keys(translations).length > 0 ? jsonTranslations = JSON.stringify(obj, null, 4) : jsonTranslations = JSON.stringify(importedTranslations, null, 4);
     }
-    const updateImportedTranslations = () => {
+    const updateExportedTranslations = () => {
         for (let key in translations) {
-            importedTranslations[key] = translations[key];
+            //importedTranslations[key] = translations[key];
+            exportedTranslations[key] = translations[key];
         }
         console.log("importedTranslations", importedTranslations);
+        console.log("exportedTranslations", exportedTranslations);
     };
     return function () {
         return {
             setImportedTranslations: (data) => {
+                // this gets called only when a file is uploaded
                 let obj = JSON.parse(data);
                 importedTranslations = obj;
+                console.log("importedTranslations after setImportedTranslations =>", importedTranslations);                
                 setTranslationsAsJSON(data);
+            },
+            setExportedTranslations: (data) => {
+                let obj = JSON.parse(data);                
+                exportedTranslations = obj;
             },
             getImportedTranslations: () => {
                 return importedTranslations;
             },
+            getExportedTranslations: () => {
+                return exportedTranslations;
+            },
             SetTranslationsAsJSON: (data) => {
                 return setTranslationsAsJSON(data);
             },
-            setTranslations: (e) => {
-                let key = e.target.getAttribute("key");
-                let val = e.target.value;
+            SyncCommonKeyValues: (key, val) => {                
+                return syncCommonKeyValues(key, val);
+            },
+            // setTranslations: (e) => {
+            //     //console.log(paginationService().GetPages().collections);
+            //     let key = e.target.getAttribute("key");
+            //     let val = e.target.value;
 
-                syncCommonKeyValues(key, val);
+            //     //syncCommonKeyValues(key, val);
 
-                // ensure COMMON key translation values are prefixed with "@:"
-                // (this allows easy copy paste from key in table)
-                if (val.match(/^COMMON\./)) {
-                    val = `@:${val}`;
+            //     // ensure COMMON key translation values are prefixed with "@:"
+            //     // (this allows easy copy paste from key in table)
+            //     if (val.match(/^COMMON\./)) {
+            //         val = `@:${val}`;
+            //     }
+
+            //     if (val !== "") {
+            //         translations[key] = val;
+            //     } else {
+            //         delete translations[key];
+            //     }                
+            //     updateExportedTranslations();
+            //     setTranslationsAsJSON();
+            //     return translations;
+            // },
+            setTranslations: () => {
+                let collections = paginationService().GetPages().collections;
+                for (let collection of Array.from(collections)) {
+                    for (let row of collection) {
+                        let translationsTextarea = row.querySelector("textarea");
+                        let key = translationsTextarea.getAttribute("key");
+                        let val = translationsTextarea.value;
+
+                        // ensure COMMON key translation values are prefixed with "@:"
+                        // (this allows easy copy paste from key in table)
+                        if (val.match(/^COMMON\./)) {
+                            val = `@:${val}`;
+                        }
+                        if (val !== "") {
+                            translations[key] = val;
+                        } else {
+                            delete translations[key];
+                        }
+                    }
                 }
 
-                if (val !== "") {
-                    translations[key] = val;
-                } else {
-                    delete translations[key];
-                }                
-                updateImportedTranslations();
+                updateExportedTranslations();
                 setTranslationsAsJSON();
-                return translations;
+
+                return translations;               
             },
             getTranslations: () => {
                 return translations;
@@ -200,7 +248,7 @@ const translationsService = (function(){
 const paginationService = (function() {
     let pagination = {}
     let currentPage = 1;
-    let itemsPerPage = 50;
+    let itemsPerPage = 10;
     const updateCurrentPage = (page) => {
         currentPage = page;
     };
@@ -220,6 +268,7 @@ const paginationService = (function() {
             }
             updateCurrentPage(page);
         }
+        translationsTableService().resize();
     };
     const getPages = () => {
         return pagination;
@@ -256,6 +305,9 @@ const paginationService = (function() {
             },
             hideCtrls: () => {
                 pagination_ctrls.classList.remove("active");
+            },
+            GetPages: () => {
+                return getPages();
             }
         }
     }
@@ -269,9 +321,11 @@ function translationsTableService () {
     let addRow = (row) => {
         rows.push(row);
     };
-    let setTableSize = (data) => {
+    let setTableSize = (data = null) => {
 
-        let space = window.innerHeight - translations_table.offsetTop - 50;
+        console.log("data for setTableSize is:", data);
+
+        let space = window.innerHeight - translations_table.offsetTop - 100;
 
         if (table_rows.children.length === 0 && !data) {
            return;
@@ -291,9 +345,17 @@ function translationsTableService () {
         table_rows.style.height = h;
     };
     let checkInterpolationChanges = (e, valueToCheck, interpolationMatches) => {
+        
+        if (valueToCheck == "") {
+            e.target.classList.remove("interpolation-changed");
+            return
+        }
+       
+        let interpolationChanged = false;
         for (let match of Array.from(interpolationMatches)){
+            
             console.log("matching " + match + " against >>>", valueToCheck);
-            let interpolationChanged = false;
+            
             if (valueToCheck.match(match)) {
                 valueToCheck = valueToCheck.replace(match, "");
             } else if (!valueToCheck.match(match)) {
@@ -301,16 +363,18 @@ function translationsTableService () {
                 //alert("INTERPOLATION CHANGE DETECTED FOR: "+match);
 
                 interpolationChanged = true;
+                break;
 
                 //e.target.classList.add("interpolation-changed");
 
                 // let imported_interpolation_value = translationsService().getImportedTranslations()[e.target.getAttribute("key")];
                 // this.value = imported_interpolation_value;
                 // this.parentNode.previousElementSibling.classList.remove("line-through");
-            }
-            let type = interpolationChanged ? "add" : "remove";
-            e.target.classList[type]("interpolation-changed");
+            }            
         }
+
+        let type = interpolationChanged ? "add" : "remove";
+        e.target.classList[type]("interpolation-changed");
     };
     return {
         filter: (data) => {
@@ -381,12 +445,19 @@ function translationsTableService () {
                          enTD.innerHTML += `<div class="interpolation-warning">Text in red should NOT be changed</div>`;
 
                          translationTextarea.addEventListener("keyup", function (e) {
+                            
+                            let keyPressed = e.keyCode || e.charCode;
+                           
+                            console.log("e.target.value", e.target.value);
+
                             let interpolationMatches = enTD.getAttribute("interpolation").split(",");
                             let valueToCheck = this.value;
 
                             console.log("interpolationMatches", interpolationMatches);
 
+                         
                             checkInterpolationChanges(e, valueToCheck, interpolationMatches);
+
          
                          });
                     }
@@ -409,31 +480,49 @@ function translationsTableService () {
                     translationTextarea.addEventListener("click", function (e) {
                         let en = this.parentNode.parentNode.querySelectorAll(".td")[1];
                         if (en.hasAttribute("interpolation") && this.value === "") {
-                            let imported_interpolation_value = translationsService().getImportedTranslations()[this.getAttribute("key")];
-                            this.value = imported_interpolation_value;
+                            let exportedInterpolationValue = translationsService().getExportedTranslations()[this.getAttribute("key")];
+                            this.value = exportedInterpolationValue;
                             this.parentNode.previousElementSibling.classList.remove("line-through");
                         }
                     });
 
                     translationTextarea.addEventListener("keyup", function (e) {
-                        let key = e.keyCode || e.charCode;
-                        if (key === 13) {
+                        let keyPressed = e.keyCode || e.charCode;
+                        let keyAttr = this.getAttribute("key");
+                        let val = this.value;
+                        
+                        if (keyPressed === 13) {
                             e.preventDefault();
+                            return
                         }
-                        if (this.value != "" && this.value != this.parentNode.previousElementSibling.getAttribute("plain-text-value")) {
+
+                        if (val != "" && val != this.parentNode.previousElementSibling.getAttribute("plain-text-value")) {
                             this.parentNode.previousElementSibling.classList.add("line-through");
                         } else {
                             this.parentNode.previousElementSibling.classList.remove("line-through");
                         }
-                        translationsService().setTranslations(e);
-                        localStorageService().setLocalStorage();
-                        console.log(localStorageService().getLocalStorage());
+
+                        translationsService().SyncCommonKeyValues(keyAttr, val);
+
+                        
+
+                        // ####################################################################################
+                        // THIS HAS NOW BEEN MOVED TO MOUSEENTER EVENTS ON THE SAVE AND DOWNLOAD BUTTONS
+                        // WHICH MEANS TRANSLATIONS ARE NOT SET ON EACH KEYPRESS BUT ONLY AT THE END
+                        // AND ON THE CHANGE EVENT FOR EACH TEXTAREA
+
+                        // translationsService().setTranslations();
+                        // localStorageService().setLocalStorage();
+                        
+                        // console.log(localStorageService().getLocalStorage());
+
+                        // ####################################################################################
                     });
 
                     translationTextarea.addEventListener("change", function (e) {
-                        translationsService().setTranslations(e);
+                        translationsService().setTranslations();
                         localStorageService().setLocalStorage();
-                        console.log("changed: ", this.value);
+                        // console.log("changed: ", this.value);
                     });
 
                     //addRow(row, delay);
@@ -641,8 +730,10 @@ const localStorageService = (function () {
         return {
            setLocalStorage: () => {
                 //localStorageObj["translationsTable"] = translationsService().getJSONTranslations();
+                localStorageObj["exportedTranslations"] = JSON.stringify(translationsService().getExportedTranslations(), null, 4);
                 localStorageObj["importedTranslations"] = JSON.stringify(translationsService().getImportedTranslations(), null, 4);
                 localStorageObj["translations"] = JSON.stringify(translationsService().getTranslations(), null, 4);
+                
                 if (fileService().getFile()) {
                     localStorageObj["fileName"] = fileService().getFile().name;
                 }
@@ -663,8 +754,13 @@ const localStorageService = (function () {
             getLocalStorage: () => {
                 return localStorage;
             },
-            clearLocalStorage: () => {
-                return localStorage.clear();
+            clear: () => {
+                let prefix = "jsonTranslationsEditor_";
+                let items = [`${prefix}importedTranslations`, `${prefix}exportedTranslations`, `${prefix}translations`, `${prefix}fileName`];
+                for (let item of items) {
+                    localStorage.removeItem(item);
+                }
+                //return localStorage.clear();
             }
         }
     }
@@ -694,10 +790,16 @@ export default {
 
                     fileService().setFile(file);
 
-
                     file_name.innerHTML = fileService().getFile().name;
 
                     translationsService().setImportedTranslations(textData);
+                    translationsService().setExportedTranslations(textData);
+
+                    localStorageService().clear();
+
+                    console.log("localStorage after clear():", localStorage);
+
+                    // return;
 
                     localStorageService().setLocalStorage();
 
@@ -729,6 +831,9 @@ export default {
     TranslationsService() {
         return translationsService();
     },
+    LocalStorageService() {
+        return localStorageService();
+    },
     AlertService() {
         return alertService();
     },
@@ -737,9 +842,9 @@ export default {
     },
     init() {
 
-        console.log(localStorageService().getLocalStorage());
+        console.log("init() localStorage:", localStorageService().getLocalStorage());
 
-        if (localStorageService().getLocalStorage()["jsonTranslationsEditor_importedTranslations"]) {
+        if (localStorageService().getLocalStorage()["jsonTranslationsEditor_exportedTranslations"]) {
           
 
             loadingService().setLoading();
@@ -747,18 +852,20 @@ export default {
 
             let localStorageData = localStorageService().getLocalStorage();
            
-            let textData = localStorageData["jsonTranslationsEditor_importedTranslations"];
+            let importedTranslations = localStorageData["jsonTranslationsEditor_importedTranslations"];
+            let exportedTranslations = localStorageData["jsonTranslationsEditor_exportedTranslations"];
             let fileName = localStorageData["jsonTranslationsEditor_fileName"];
 
-            malenkyFileService().build(textData, fileName);
+            malenkyFileService().build(exportedTranslations, fileName);
 
-            translationsService().setImportedTranslations(textData);
+            translationsService().setImportedTranslations(importedTranslations);
+            translationsService().setExportedTranslations(exportedTranslations);
 
-            translationsTableService().init(textData);
+            translationsTableService().init(exportedTranslations);
 
             let interval = setInterval(function(){
                 if (loadingService().isLoading()) {
-                    translationsTableService().build(textData);
+                    translationsTableService().build(exportedTranslations);
                     clearInterval(interval);
                 }
             }, 10);
