@@ -149,7 +149,7 @@ export function translationsTableService () {
 
                     if (interpolationMatches && !en.match(/@:/)) {
                          enTD.setAttribute("interpolation", interpolationMatches);
-                         enTD.innerHTML += `<div class="interpolation-warning">This translation contains interpolation. Changing text within curly braces is not recommended.</div>`;
+                         enTD.innerHTML += `<div class="interpolation-warning">This translation contains interpolation. Changing text inside curly braces or with underscores is not recommended.</div>`;
 
                          translationTextarea.addEventListener("keyup", function (e) {
 
