@@ -5,8 +5,8 @@ import "./scripts/main";
 // FOR TESTING ONLY >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 import Services from "./scripts/services";
 
-Services.log();
-Services.es6BabelTest();
+// Services.log();
+// Services.es6BabelTest();
 
 // END TESTING ONLY >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
