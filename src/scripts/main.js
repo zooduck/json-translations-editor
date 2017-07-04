@@ -3,11 +3,9 @@ import {export_translations_ctrl, dev_translations_ctrl, file_input, search_tabl
 // Services...
 import Services from "./services";
 
-
 Services.init();
 
 // Event Listeners...
-
 export_translations_ctrl.addEventListener("click", function () {
 	Services.TranslationsService().setTranslations();
 	Services.LocalStorageService().setLocalStorage();

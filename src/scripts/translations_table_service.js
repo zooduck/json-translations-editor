@@ -1,10 +1,11 @@
-import flat from "flat";
+// DOM...
 import {translations_table, table_rows, translations_table_row_TEMPLATE} from "./dom_service";
+// Librarys...
+import flat from "flat";
+// Services...
 import {paginationService} from "./pagination_service";
 import {translationsService} from "./translations_service";
 import {localStorageService} from "./local_storage_service";
-
-
 
 export function translationsTableService () {
     let rows = [];
@@ -26,14 +27,12 @@ export function translationsTableService () {
 
         if (!data) {
             let h = table_rows.children.length < 10 ? "auto" : `${space}px`;
-            table_rows.style.height = h;
-            // table_rows.style.height = `${(window.innerHeight - translations_table.offsetTop - 50)}px`;
+            table_rows.style.height = h;           
             return;
         }
 
         // let keys = Object.keys(flat.flatten(JSON.parse(data)));
-        let keys = Object.keys(data);
-        // let space = window.innerHeight - translations_table.offsetTop - 50;
+        let keys = Object.keys(data);       
 
         let h = keys.length < 10 ? "auto" : `${space}px`;
         table_rows.style.height = h;
@@ -110,7 +109,7 @@ export function translationsTableService () {
 
                     let patternsMatched = [];
                     if (interpolationMatches && !en.match(/@:/)) {
-                        continue; // do not prettify EN field (replacement with span tags is not reliable)                      
+                        continue; // do not prettify EN field (replacement with span tags is not yet reliable)                      
                         for (let match of interpolationMatches) {
                             let pattern = new RegExp(match, "g");
                             let alreadyMatched = false;

@@ -1,6 +1,7 @@
+// DOM...
 import {paper_content, paper_title, import_prompt} from "./dom_service";
+// Services...
 import {loadingService} from "./loading_service";
-
 import {translationsService} from "./translations_service";
 
 export function malenkyFileService () {
@@ -11,17 +12,17 @@ export function malenkyFileService () {
              paper_content.appendChild(part);
              paper_content.scrollTop = scrollHeight;
          }, delay);
-    }
+    };
     let getContentHeight = (data) => {
         paper_content.innerHTML = data;
         return paper_content.scrollHeight;
-    }
+    };
     let init = () => {
         import_prompt.innerHTML = "Importing file";
         paper_title.innerHTML = "";
         paper_content.innerHTML = "";
         loadingService().show();
-    }
+    };
     return {
         calculateContentHeight: (data) => {
             paper_content.innerHTML = data;

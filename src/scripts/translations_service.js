@@ -1,6 +1,8 @@
+// DOM...
+import {table_rows} from "./dom_service";
+// Services...
 import {localStorageService} from "./local_storage_service";
 import {paginationService} from "./pagination_service";
-import {table_rows} from "./dom_service";
 
 export const translationsService = (function(){
 
@@ -11,7 +13,7 @@ export const translationsService = (function(){
         export: {},
         import: {},
         dev: {}
-    }
+    };
 
     const init = () => {
 
@@ -104,7 +106,7 @@ export const translationsService = (function(){
 
                 if (data) {
 
-                    init();
+                    init(); // reset translations object
 
                     let obj = JSON.parse(data);
                     if (obj.export && obj.import) {                       
@@ -117,6 +119,7 @@ export const translationsService = (function(){
                 }
 
                 console.log(translations);
+                
                 debugger
 
                 // updateTranslations();
@@ -167,15 +170,7 @@ export const translationsService = (function(){
                     name: file.name.split(".")[0],
                     ext: file.name.split(".")[1]
                 });
-            },
-            // init: (e) => {
-            //     alert("called");
-            //     translations = {
-            //         export: {},
-            //         import: {},
-            //         dev: {}
-            //     }
-            // }
+            }
         }
     }
 })();

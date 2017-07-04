@@ -1,3 +1,4 @@
+// DOM...
 import {loading_screen} from "./dom_service";
 
 export const loadingService = (function(){

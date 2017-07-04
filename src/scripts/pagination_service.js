@@ -1,6 +1,7 @@
+// DOM...
 import {pagination_ctrls, table_rows} from "./dom_service";
+// Services...
 import {translationsTableService} from "./translations_table_service";
-
 
 export const paginationService = (function() {
     let pagination = {}
