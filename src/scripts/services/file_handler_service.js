@@ -50,7 +50,7 @@ export const fileHandlerService = function (e) {
                 let interval = setInterval(function(){
                 if (loadingService().isLoading()) {
                         // console.log(translationsService().getTranslations());                       
-                        translationsTableService().build(translationsService().getTranslations().export);
+                        translationsTableService().build(translationsService().getTranslations());
                         clearInterval(interval);
                     }
                 }, 10);

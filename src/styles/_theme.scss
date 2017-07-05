@@ -156,6 +156,8 @@ body {
 	}
 	#fileName {
 		margin-left: 5px;
+		max-width: 200px;
+		word-wrap: break-word;
 	}
 	.pagination-ctrls {
 		display: flex;

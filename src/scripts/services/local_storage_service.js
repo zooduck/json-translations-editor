@@ -57,7 +57,7 @@ export const localStorageService = (function () {
 		                // let fileName = localStorageService().GetLocalStorage().JTE_FILENAME;
 
 		                let translations = JSON.parse(getLocalStorage().JTE_TRANSLATIONS);
-		                let data = translations.export;
+		                let data = translations;
 		                let fileName = getLocalStorage().JTE_FILENAME;
 
 

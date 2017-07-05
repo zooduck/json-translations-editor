@@ -93,7 +93,7 @@ export const translationsService = (function(){
                             }
                             translations.export[key] = val;
                         } else {
-                            //translations.export[key] = translations.import[key];
+                            translations.export[key] = translations.import[key];
                         }
                     }
                 }
@@ -115,6 +115,9 @@ export const translationsService = (function(){
             }
         }
 
+        // console.log("translations after update:", translations);
+        // debugger
+
         localStorageService().setLocalStorage();
 
     };
@@ -135,38 +138,31 @@ export const translationsService = (function(){
 
                 if (data) {
 
-                    init(); // reset translations object                   
+                    init(); // reset translations object 
 
-                    if (flattenData) {
-                        data = JSON.stringify(flat.flatten(JSON.parse(data)), null, 4);
-                    }
-                                    
+                    let dataObj = JSON.parse(data);
 
-                    let obj = JSON.parse(data);
+                   
+                    // ----------------------------------------------------------------------------------------------------------------
+                    // NOTE: This is here only to allow deep objects like package.json to be imported (and not crash the application)  
+                    // ----------------------------------------------------------------------------------------------------------------   
+                    if (flattenData && !dataObj.export && !dataObj.import && !dataObj.dev) {
+                        dataObj = JSON.parse(JSON.stringify(flat.flatten(JSON.parse(data)), null, 4));                       
+                    }            
 
-                    // console.log("obj", obj);
-                    // debugger
 
-                    if (obj.export && obj.import && obj.dev) {                       
-                        Object.assign(translations.export, obj.export);
-                        Object.assign(translations.import, obj.import);
-                        Object.assign(translations.dev, obj.dev);
-                    } else {  
-                        Object.assign(translations.export, obj);
-                        Object.assign(translations.import, obj);
-                    }
+
+                    if (dataObj.export) {
+                         Object.assign(translations, dataObj);
+                     } else {                       
+                        Object.assign(translations["export"], dataObj);
+                        Object.assign(translations["import"], dataObj);
+                     }                   
+
+                    console.log("translations after setTranslations:", translations);               
+
                 }
 
-                console.log("translations after setTranslations are: ", translations);
-                //debugger
-                
-                // debugger
-
-                //updateTranslations({type: ["dev"]});
-
-                // console.log("translations after first update", translations);
-
-                //localStorageService().setLocalStorage();
                 localStorageService().setLocalStorage();
              
             },

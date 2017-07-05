@@ -90,17 +90,24 @@ export function translationsTableService () {
             console.log("USING DATA SET OF >>>>>>>>>", data);
             // debugger
             // let obj = JSON.parse(data);
-            let obj = data;
-            obj = flat(obj); // flatten
 
-            let numKeys = Object.keys(obj).length;
+
+            let exportData = flat(data.export);
+            let importData = flat(data.import);
+
+
+
+            // let obj = data;
+            // obj = flat(obj); // flatten
+
+            // let numKeys = Object.keys(obj).length;
 
             let commonKeyPattern = /^(@:)*COMMON\./;
 
-            for (let prop in obj) {
+            for (let prop in importData) {
                     let key = prop;
                     // console.log("obj[prop]", obj[prop]);
-                    let en = obj[prop].toString();
+                    let en = importData[prop].toString();
                     let enPretty = en;
                     let interpolationPattern = /(one{|other{#?|plural,?|=0{|=1{|[a-zA-Z]+_[a-zA-Z]+[},]?|{{\w+}}|{\w+}|[{}])/g;
 
@@ -148,6 +155,11 @@ export function translationsTableService () {
                     enTD.setAttribute("key", key);
 
                     translationTextarea.setAttribute("key", key);
+                    
+                    if (importData[key] !== exportData[key]) {
+                        translationTextarea.value = exportData[key];
+                        enTD.querySelector("span").classList.add("line-through");
+                    }                    
 
 
                     if (key.match(commonKeyPattern)) {
@@ -181,7 +193,7 @@ export function translationsTableService () {
                     }
 
                     if (en.match(commonKeyPattern)) {
-                        let commonVal = obj[en.substr(2)];
+                        let commonVal = exportData[en.substr(2)];
                         let commonKey = en;
                         // enTD.innerHTML += `<div class="common-value">${commonVal}</div>`;
                         enTD.querySelector(".common-value").innerHTML = commonVal;
