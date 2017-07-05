@@ -1,33 +1,38 @@
 // DOM...
-import {export_translations_ctrl, dev_translations_ctrl, file_input, search_table, pagination_ctrls} from "./dom_service";
+import {export_translations_ctrl, dev_translations_ctrl, file_input, search_table, pagination_ctrls} from "./services/dom_service";
 // Services...
-import Services from "./services";
+import {localStorageService} from "./services/local_storage_service";
+import {translationsService} from "./services/translations_service";
+import {translationsTableService} from "./services/translations_table_service";
+import {paginationService} from "./services/pagination_service";
+import {fileHandlerService} from "./services/file_handler_service";
 
-Services.init();
+localStorageService().init();
 
 // Event Listeners...
-export_translations_ctrl.addEventListener("click", function () {
-	Services.TranslationsService().setTranslations();
-	Services.LocalStorageService().setLocalStorage();
-	Services.TranslationsService().saveJSON(this);
-});
 
 dev_translations_ctrl.addEventListener("click", function () {
-	Services.TranslationsService().setTranslations();
-	Services.LocalStorageService().setLocalStorage();
-	Services.TranslationsService().saveProgress(this);
+	translationsService().setTranslations();
+	//localStorageService().setLocalStorage();
+	translationsService().saveDev(this);
 });
 
-file_input.addEventListener("change", Services.FileHandlerService);
+export_translations_ctrl.addEventListener("click", function () {
+	translationsService().setTranslations();
+	//localStorageService().setLocalStorage();
+	translationsService().saveExport(this);
+});
+
+file_input.addEventListener("change", fileHandlerService);
 
 search_table.addEventListener("keyup", function () {
-	Services.TranslationsTableService().filter(this.value);
+	translationsTableService().filter(this.value);
 });
 
 pagination_ctrls.querySelectorAll("i")[0].addEventListener("click", function () {
-	Services.PaginationService().loadPreviousPage();
+	paginationService().loadPreviousPage();
 });
 
 pagination_ctrls.querySelectorAll("i")[1].addEventListener("click", function () {
-	Services.PaginationService().loadNextPage();
+	paginationService().loadNextPage();
 });
