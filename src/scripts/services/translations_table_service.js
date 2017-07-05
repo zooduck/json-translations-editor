@@ -37,10 +37,10 @@ export function translationsTableService () {
         table_rows.style.height = h;
 
     };
-    let checkInterpolationChanges = (e, valueToCheck, interpolationMatches) => {
+    let checkInterpolationChanges = (textarea, valueToCheck, interpolationMatches) => {
 
         if (valueToCheck == "") {
-            e.target.classList.remove("interpolation-changed");
+            textarea.classList.remove("interpolation-changed");
             return
         }
 
@@ -67,7 +67,7 @@ export function translationsTableService () {
         }
 
         let type = interpolationChanged ? "add" : "remove";
-        e.target.classList[type]("interpolation-changed");
+        textarea.classList[type]("interpolation-changed");
     };
 
     window.addEventListener("resize", function () {
@@ -155,11 +155,16 @@ export function translationsTableService () {
                     enTD.setAttribute("key", key);
 
                     translationTextarea.setAttribute("key", key);
-                    
+
                     if (importData[key] !== exportData[key]) {
                         translationTextarea.value = exportData[key];
                         enTD.querySelector("span").classList.add("line-through");
-                    }                    
+                        
+                        // let interpolationMatches = enTD.getAttribute("interpolation").split(",");
+                        checkInterpolationChanges(translationTextarea, exportData[key], interpolationMatches);
+                    }  
+                    
+               
 
 
                     if (key.match(commonKeyPattern)) {
@@ -188,9 +193,11 @@ export function translationsTableService () {
                             let interpolationMatches = enTD.getAttribute("interpolation").split(",");
                             let valueToCheck = this.value;
 
-                            checkInterpolationChanges(e, valueToCheck, interpolationMatches);
+                            checkInterpolationChanges(this, valueToCheck, interpolationMatches);
                          });
                     }
+
+
 
                     if (en.match(commonKeyPattern)) {
                         let commonVal = exportData[en.substr(2)];
@@ -211,17 +218,21 @@ export function translationsTableService () {
 
                     translationTextarea.addEventListener("click", function (e) {
                         let en = this.parentNode.parentNode.querySelectorAll(".td")[1];
-                        if (en.hasAttribute("interpolation") && this.value === "") {
-                            // let exportedInterpolationValue = translationsService().getExportedTranslations()[this.getAttribute("key")];
+                        //if (en.hasAttribute("interpolation") && this.value === "") {
+                        if (en.hasAttribute("interpolation")) {                                         
                             let exportedInterpolationValue = translationsService().getTranslations().export[this.getAttribute("key")];
                             this.value = exportedInterpolationValue;
                             this.parentNode.previousElementSibling.classList.remove("line-through");
+
+                            let interpolationMatches = enTD.getAttribute("interpolation").split(",");
+                            checkInterpolationChanges(this, this.value, interpolationMatches);
                         }
 
-                        if (enTD.hasAttribute("interpolation-matches")) {
-                            let interpolationMatches = enTD.getAttribute("interpolation").split(",");
-                            checkInterpolationChanges(e, this.value, interpolationMatches);
-                        }
+                        // if (enTD.hasAttribute("interpolation-matches")) {
+                        //     alert("interpolation-matches");
+                        //     let interpolationMatches = enTD.getAttribute("interpolation").split(",");
+                        //     checkInterpolationChanges(e, this.value, interpolationMatches);
+                        // }
 
 
                     });
