@@ -1,0 +1,21 @@
+{
+    "export": {
+        "CORE.ALERTS.ERROR_HEADING": "Error",
+        "CORE.ALERTS.POSTCODE_INVALID": "@:COMMON.TERMINOLOGY.POSTCODE_INVALID",
+        "COMMON.TERMINOLOGY.POSTCODE_INVALID": "POSTCODE IS NOT VALID!!!",
+        "VALIDATE_ID": "Please validate your id",
+        "CORE.ALERTS.MISSING_LOCATION": "Please enter your location",
+        "COMMON.TERMINOLOGY.POSTCODE": "postcode"
+    },
+    "import": {
+        "CORE.ALERTS.ERROR_HEADING": "Error",
+        "CORE.ALERTS.POSTCODE_INVALID": "@:COMMON.TERMINOLOGY.POSTCODE_INVALID",
+        "COMMON.TERMINOLOGY.POSTCODE_INVALID": "Invalid postcode",
+        "VALIDATE_ID": "Please validate your id",
+        "CORE.ALERTS.MISSING_LOCATION": "Please enter your location",
+        "COMMON.TERMINOLOGY.POSTCODE": "postcode"
+    },
+    "dev": {
+        "COMMON.TERMINOLOGY.POSTCODE_INVALID": "POSTCODE IS NOT VALID!!!"
+    }
+}
