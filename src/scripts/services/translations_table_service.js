@@ -218,14 +218,13 @@ export function translationsTableService () {
 
                     translationTextarea.addEventListener("click", function (e) {
                         let en = this.parentNode.parentNode.querySelectorAll(".td")[1];
-                        //if (en.hasAttribute("interpolation") && this.value === "") {
-                        if (en.hasAttribute("interpolation")) {                                         
+                        if (en.hasAttribute("interpolation") && this.value === "") {                                                             
                             let exportedInterpolationValue = translationsService().getTranslations().export[this.getAttribute("key")];
                             this.value = exportedInterpolationValue;
                             this.parentNode.previousElementSibling.classList.remove("line-through");
 
-                            let interpolationMatches = enTD.getAttribute("interpolation").split(",");
-                            checkInterpolationChanges(this, this.value, interpolationMatches);
+                            // let interpolationMatches = enTD.getAttribute("interpolation").split(",");
+                            // checkInterpolationChanges(this, this.value, interpolationMatches);
                         }
 
                         // if (enTD.hasAttribute("interpolation-matches")) {
