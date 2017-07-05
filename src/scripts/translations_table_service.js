@@ -102,28 +102,29 @@ export function translationsTableService () {
                     console.log("obj[prop]", obj[prop]);
                     let en = obj[prop].toString();
                     let enPretty = en;
-                    let interpolationPattern = /(one{|other{#?|plural,?|=0{|=1{|[a-zA-Z]+_[a-zA-Z]+[},]?|{{\w+}}|[{}])/g;
+                    let interpolationPattern = /(one{|other{#?|plural,?|=0{|=1{|[a-zA-Z]+_[a-zA-Z]+[},]?|{{\w+}}|{\w+}|[{}])/g;
 
                     let interpolationMatches = en.match(interpolationPattern);
 
+                     // do not prettify EN field (replacement with span tags is not yet reliable)         
 
-                    let patternsMatched = [];
-                    if (interpolationMatches && !en.match(/@:/)) {
-                        continue; // do not prettify EN field (replacement with span tags is not yet reliable)                      
-                        for (let match of interpolationMatches) {
-                            let pattern = new RegExp(match, "g");
-                            let alreadyMatched = false;
-                            for (let patternMatched of patternsMatched) {
-                                if (pattern == patternMatched) {
-                                    alreadyMatched = true;
-                                }
-                            }
-                            if (!alreadyMatched) {
-                                enPretty = enPretty.replace(pattern, `<span class=\"interpolation\">${match}</span>`);
-                                patternsMatched.push(pattern);
-                            }
-                        }
-                    }
+                    // let patternsMatched = [];
+                    // if (interpolationMatches && !en.match(/@:/)) {                                     
+                    //     for (let match of interpolationMatches) {
+                    //         let pattern = new RegExp(match, "g");
+                    //         let alreadyMatched = false;
+                    //         for (let patternMatched of patternsMatched) {
+                    //             if (pattern === patternMatched) {
+                    //                 alreadyMatched = true;
+                    //             }
+                    //         }
+                    //         if (!alreadyMatched) {
+
+                    //             enPretty = enPretty.replace(pattern, `<span class=\"interpolation\">${match}</span>`);
+                    //             patternsMatched.push(pattern);
+                    //         }
+                    //     }
+                    // }
 
                     let row = translations_table_row_TEMPLATE.cloneNode(true);
                     let translationTextarea = row.querySelector("textarea");
@@ -132,7 +133,6 @@ export function translationsTableService () {
 
                     row.removeAttribute("id");
                     row.classList.remove("template");
-
 
                     keyTD.innerHTML = `<span>${key}</span>`;
                     enTD.innerHTML = `<span>${enPretty}</span>`;
@@ -148,7 +148,7 @@ export function translationsTableService () {
 
                     if (interpolationMatches && !en.match(/@:/)) {
                          enTD.setAttribute("interpolation", interpolationMatches);
-                         enTD.innerHTML += `<div class="interpolation-warning">This translation contains interpolation. Changing text inside curly braces or with underscores is not recommended.</div>`;
+                         enTD.innerHTML += `<div class="interpolation-warning">This translation contains interpolation. Changing text inside curly braces or text with underscores is not recommended.</div>`;
 
                          translationTextarea.addEventListener("keyup", function (e) {
 
@@ -179,7 +179,8 @@ export function translationsTableService () {
                     translationTextarea.addEventListener("click", function (e) {
                         let en = this.parentNode.parentNode.querySelectorAll(".td")[1];
                         if (en.hasAttribute("interpolation") && this.value === "") {
-                            let exportedInterpolationValue = translationsService().getExportedTranslations()[this.getAttribute("key")];
+                            // let exportedInterpolationValue = translationsService().getExportedTranslations()[this.getAttribute("key")];
+                            let exportedInterpolationValue = translationsService().getTranslations().import[this.getAttribute("key")];
                             this.value = exportedInterpolationValue;
                             this.parentNode.previousElementSibling.classList.remove("line-through");
                         }

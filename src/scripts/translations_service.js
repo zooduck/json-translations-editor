@@ -130,12 +130,12 @@ export const translationsService = (function(){
             getTranslations: () => {
                 return translations;
             },
-            setTextData: (data) => {
-                textData = data;
-            },
-            getTextData: () => {
-                return textData;
-            },
+            // setTextData: (data) => {
+            //     textData = data;
+            // },
+            // getTextData: () => {
+            //     return textData;
+            // },
             setCommonKey: (key, val) => {
                 commonKeys[key] = val;
             },

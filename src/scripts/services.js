@@ -8,6 +8,7 @@ import {malenkyFileService} from "./malenky_file_service";
 import {loadingService} from "./loading_service";
 import {confirmService} from "./confirm_service";
 import {fileHandlerService} from "./file_handler_service";
+import {paginationService} from "./pagination_service";
 
 export default {
     FileHandlerService(e) {       
@@ -22,9 +23,9 @@ export default {
     LocalStorageService() {
         return localStorageService();
     },
-    AlertService() {
-        return alertService();
-    },
+    // AlertService() {
+    //     return alertService();
+    // },
     PaginationService() {
         return paginationService();
     },
