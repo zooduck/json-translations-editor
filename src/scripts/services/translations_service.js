@@ -184,15 +184,18 @@ export const translationsService = (function(){
             saveDev: (link) => {
                 console.log("saveDev() translations:", translations);
 
-                if (Object.keys(translations.dev).length < 1) { 
-                    event.preventDefault();                   
-                    return alertService().raise("ERROR.NO_TRANSLATIONS_TO_SAVE");
-                }
+                // if (Object.keys(translations.dev).length < 1) { 
+                //     event.preventDefault();                   
+                //     return alertService().raise("ERROR.NO_TRANSLATIONS_TO_SAVE");
+                // }
+
+                // COMMENTED OUT ^^^ RE BELOW HACK
 
                 if (link) {
                     let fileName = fileService().getFileName().split(".")[0];
                     let fileExt = fileService().getFileName().split(".")[1];
-                    let jsonData = JSON.stringify(flat.unflatten(translations.dev), null, 4);
+                    //let jsonData = JSON.stringify(flat.unflatten(translations.dev), null, 4);
+                    let jsonData = JSON.stringify(flat.unflatten(translations.export), null, 4);  // HACK FOR JUST UNFLATTENING ANGULAR TRANSLATIONS FILE
                     let textData = new Blob([jsonData], {type: "text/plain"});
                     let file = window.URL.createObjectURL(textData);
                     link.download = `${fileName}_EDIT_${getDateTimeSuffix()}.${fileExt}`;
