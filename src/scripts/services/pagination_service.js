@@ -6,7 +6,7 @@ import {translationsTableService} from "./translations_table_service";
 export const paginationService = (function() {
     let pagination = {}
     let currentPage = 1;
-    let itemsPerPage = 10;
+    let itemsPerPage = 50;
     const updateCurrentPage = (page) => {
         currentPage = page;
     };
