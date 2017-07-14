@@ -48,15 +48,15 @@
              <div class="ctrls container-flex break">
                 <!-- upload file -->
                 <input id="file" type="file" hidden>
-                <label for="file">
+                <label for="file" title="Import translations">
                     <i class="ion-md-add"></i>
                 </label>
-                <!-- download file -->
-                <a id="devTranslationsCtrl" download="" href="">
+                <!-- download JSON translations for developers -->
+                <a id="devTranslationsCtrl" download="" href="" title="Download translations">
                     <i class="ion-md-cloud-download"></i>
                 </a>
                 <!-- save progress -->
-                <a id="exportTranslationsCtrl" download="" href="">
+                <a id="exportTranslationsCtrl" download="" href="" title="Save Progress (export to file)">
                     <i class="fa fa-save"></i>
                 </a>    
                             
@@ -67,9 +67,9 @@
                 <input id="searchTable" type="text" placeholder="Search...">
                 <!-- pagination -->
                 <div class="pagination-ctrls" id="paginationCtrls">
-                    <i class="ion-md-arrow-back"></i>
-                    <span class="pagination-info"></span>
-                    <i class="ion-md-arrow-forward"></i>
+                    <i class="ion-md-arrow-back disabled"></i>
+                    <span class="pagination-info">page 0 of 0</span>
+                    <i class="ion-md-arrow-forward disabled"></i>
                 </div>
             </div>
 

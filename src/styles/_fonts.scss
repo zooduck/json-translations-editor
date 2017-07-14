@@ -6,10 +6,18 @@
 	font-size: 2em;
 	color: $icon-base;
 
-	&:hover {
+	&:hover:not(.disabled) {
+		transform: scale(1.2);
 		&:before, &:after {
-			color: lighten($icon-base, 25%);	
+			color: lighten($icon-base, 25%);
+			transform: scale(1.2);
 		}
 			
+	}
+	&.disabled {
+		pointer-events: none;
+		&:before, &:after {
+			opacity: 0.5;
+		}
 	}
 }

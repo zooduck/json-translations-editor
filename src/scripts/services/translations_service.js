@@ -86,7 +86,7 @@ export const translationsService = (function(){
                         let key = textarea.getAttribute("key");
                         let val = textarea.value;
                         let commonKeyAsValuePrefix = "@:";
-                        
+
                         if (val !== "") {
                             if (val.match(/^COMMON\./)) {
                                 val = `${commonKeyAsValuePrefix}${val}`;
@@ -97,7 +97,7 @@ export const translationsService = (function(){
                         }
                     }
                 }
-            }  
+            }
         }
 
         // console.log("translations before update .dev", translations);
@@ -138,33 +138,33 @@ export const translationsService = (function(){
 
                 if (data) {
 
-                    init(); // reset translations object 
+                    init(); // reset translations object
 
                     let dataObj = JSON.parse(data);
 
-                   
+
                     // ----------------------------------------------------------------------------------------------------------------
-                    // NOTE: This is here only to allow deep objects like package.json to be imported (and not crash the application)  
-                    // ----------------------------------------------------------------------------------------------------------------   
+                    // NOTE: This is here only to allow deep objects like package.json to be imported (and not crash the application)
+                    // ----------------------------------------------------------------------------------------------------------------
                     if (flattenData && !dataObj.export && !dataObj.import && !dataObj.dev) {
-                        dataObj = JSON.parse(JSON.stringify(flat.flatten(JSON.parse(data)), null, 4));                       
-                    }            
+                        dataObj = JSON.parse(JSON.stringify(flat.flatten(JSON.parse(data)), null, 4));
+                    }
 
 
 
                     if (dataObj.export) {
                          Object.assign(translations, dataObj);
-                     } else {                       
+                     } else {
                         Object.assign(translations["export"], dataObj);
                         Object.assign(translations["import"], dataObj);
-                     }                   
+                     }
 
-                    console.log("translations after setTranslations:", translations);               
+                    console.log("translations after setTranslations:", translations);
 
                 }
 
                 localStorageService().setLocalStorage();
-             
+
             },
             resetTranslationKey: (key) => {
                 if (key) {
@@ -184,8 +184,8 @@ export const translationsService = (function(){
             saveDev: (link) => {
                 console.log("saveDev() translations:", translations);
 
-                if (Object.keys(translations.dev).length < 1) { 
-                    event.preventDefault();                   
+                if (Object.keys(translations.dev).length < 1) {
+                    event.preventDefault();
                     return alertService().raise("ERROR.NO_TRANSLATIONS_TO_SAVE");
                 }
 
@@ -204,7 +204,7 @@ export const translationsService = (function(){
             saveExport: (link) => {
                 if (link) {
                     let fileName = fileService().getFileName().split(".")[0];
-                    let fileExt = fileService().getFileName().split(".")[1];                   
+                    let fileExt = fileService().getFileName().split(".")[1];
                     // let jsonData = JSON.stringify(translations.export, null, 4);
                     // jsonData += JSON.stringify(translations.import, null, 4);
 

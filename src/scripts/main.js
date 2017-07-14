@@ -6,20 +6,14 @@ import {translationsService} from "./services/translations_service";
 import {translationsTableService} from "./services/translations_table_service";
 import {paginationService} from "./services/pagination_service";
 import {fileHandlerService} from "./services/file_handler_service";
-
-localStorageService().init();
-
 // Event Listeners...
-
 dev_translations_ctrl.addEventListener("click", function () {
 	translationsService().setTranslations();
-	//localStorageService().setLocalStorage();
 	translationsService().saveDev(this);
 });
 
 export_translations_ctrl.addEventListener("click", function () {
 	translationsService().setTranslations();
-	//localStorageService().setLocalStorage();
 	translationsService().saveExport(this);
 });
 
@@ -36,3 +30,5 @@ pagination_ctrls.querySelectorAll("i")[0].addEventListener("click", function () 
 pagination_ctrls.querySelectorAll("i")[1].addEventListener("click", function () {
 	paginationService().loadNextPage();
 });
+// Initialisation
+localStorageService().init();
