@@ -85,6 +85,19 @@ export function translationsTableService () {
                 }
             }
         },
+        filterAll: (data) => {
+            let pattern = new RegExp(data, "i");
+            let collections = paginationService().GetPages().collections;
+            for (let collection of Array.from(collections)) {
+                for (let row of collection) {
+                    let key = row.firstElementChild.innerText;
+                    if (key.match(pattern)) {
+                        console.log("match found for key: ", key);
+                    }
+                }
+            }   
+            //console.table(paginationService().GetPages().collections);
+        },
         build: (data) => {
             console.log("START BUILD");
             console.log("USING DATA SET OF >>>>>>>>>", data);

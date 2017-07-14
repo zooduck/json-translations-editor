@@ -21,6 +21,7 @@ file_input.addEventListener("change", fileHandlerService);
 
 search_table.addEventListener("keyup", function () {
 	translationsTableService().filter(this.value);
+	translationsTableService().filterAll(this.value);
 });
 
 pagination_ctrls.querySelectorAll("i")[0].addEventListener("click", function () {
