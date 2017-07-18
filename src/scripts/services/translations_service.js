@@ -8,6 +8,7 @@ import {paginationService} from "./pagination_service";
 import {fileService} from "./file_service";
 import {alertService} from "./alert_service";
 import {translationsTableService} from "./translations_table_service";
+import {confirmService} from "./confirm_service";
 
 export const translationsService = (function(){
 
@@ -102,7 +103,7 @@ export const translationsService = (function(){
 
         // 3. update page
         if (options.type.indexOf("page") !== -1) {
-            translations.page = paginationService().GetLastViewedPage();           
+            translations.page = paginationService().GetLastViewedPage();
         }
 
         localStorageService().setLocalStorage();
@@ -114,10 +115,10 @@ export const translationsService = (function(){
             SyncCommonKeyValues: (key, val) => {
                 return syncCommonKeyValues(key, val);
             },
-            UpdateTranslations: (options) => {               
+            UpdateTranslations: (options) => {
                 return updateTranslations(options);
             },
-            setTranslations: (data, flattenData = false) => {               
+            setTranslations: (data, flattenData = false) => {
 
                 if (!data && localStorageService().GetLocalStorage().JTE_TRANSLATIONS) {
                     data = localStorageService().GetLocalStorage().JTE_TRANSLATIONS;
@@ -137,7 +138,7 @@ export const translationsService = (function(){
                     }
 
 
-                    if (dataObj.export) {                         
+                    if (dataObj.export) {
                          Object.assign(translations, dataObj);
                      } else {
                         Object.assign(translations["export"], dataObj);
@@ -146,26 +147,40 @@ export const translationsService = (function(){
                 }
             },
             resetTranslationKey: (key) => {
-                if (key) {        
+                if (key) {
                     translations.export[key] = translations.import[key];
                     updateTranslations({type:["dev"]});
                     return translations.import[key];
                 }
             },
             resetTranslations: () => {
-                // reset translations...
-                translations.export = translations.import;
-                translations.dev = {}
-                // reset DOM...               
-                let rows = translationsTableService().GetRows();
-                for (let row of rows) {
-                    let enTD = row.children[1];
-                    let textarea = row.children[2].querySelector("textarea");
-                    enTD.querySelector("span").classList.remove("line-through");
-                    textarea.value = "";
+
+                if (Object.keys(translations.import).length < 1) {
+                    return;
                 }
-                // update localStorage...           
-                localStorageService().setLocalStorage();
+
+
+                let promise = new Promise(function (resolve, reject) {
+                    confirmService().raise("Are you sure you want to revert all translations back to their original values?", resolve, reject);
+                });
+
+                promise.then(function (result) {
+                    // reset translations...
+                    translations.export = translations.import;
+                    translations.dev = {}
+                    // reset DOM...
+                    let rows = translationsTableService().GetRows();
+                    for (let row of rows) {
+                        let enTD = row.children[1];
+                        let textarea = row.children[2].querySelector("textarea");
+                        enTD.querySelector("span").classList.remove("line-through");
+                        textarea.value = "";
+                    }
+                    // update localStorage...
+                    localStorageService().setLocalStorage();
+                }, function (err) {
+                    // ...
+                });
             },
             getTranslations: () => {
                 return translations;
