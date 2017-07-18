@@ -1,52 +1,15 @@
 @keyframes shutterIn_fromLeft {
-	from {
-		opacity: 1;
+	0% {
 		transform: rotateX(90deg) translate(-100%);
-		// transform: translate(-100%);
 	}
-	to {
-		opacity: 1;
+	100% {
 		transform: rotateX(0deg) translate(0);
-		// transform: translate(0);
 	}
 }
 
 .shutter-in {
 	animation: shutterIn_fromLeft .5s both;
 }
-
-
-@keyframes popIn {
-	0% {
-		opacity: 0;
-		transform: scale(.5);
-	}
-	100% {
-		opacity: 1;
-		transform: scale(1);
-	}
-}
-
-.pop-in {
-	animation: popIn .5s both;
-
-	&.key {
-		//animation-duration: calc(.5s / 2);
-		animation-duration: .5s;
-	}
-	&.en {
-		//animation-delay: calc(.25s / 2);		
-		animation-duration: 1s;
-		
-	}
-	&.trans {
-		//animation-delay: calc(.5s / 2);
-		animation-duration: .5s;
-		animation-delay: .5s;
-		
-	}
-}
-
 
 @keyframes blink {
 	0% {
