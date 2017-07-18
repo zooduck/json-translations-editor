@@ -7,10 +7,10 @@
 	color: $icon-base;
 
 	&:hover:not(.disabled) {
-		transform: scale(1.2);
+		// transform: scale(1.1);
 		&:before, &:after {
 			color: lighten($icon-base, 25%);
-			transform: scale(1.2);
+			// transform: scale(1.1);
 		}
 			
 	}
