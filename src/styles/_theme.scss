@@ -33,6 +33,13 @@ body {
 		}
 	}
 
+	div {
+		display: inline-block;
+		margin-left: 10px;
+		border: solid 1px;
+		padding: 5px;
+	}
+
 	.ion-logo-nodejs {
 		color: coral;
 		margin-right: 2px;
