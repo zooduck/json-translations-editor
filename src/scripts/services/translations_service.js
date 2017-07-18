@@ -189,13 +189,13 @@ export const translationsService = (function(){
                 commonKeys[key] = val;
             },
             saveDev: (link) => {
+                // error checking...
                 if (Object.keys(translations.dev).length < 1) {
                     event.preventDefault();
                     return alertService().raise("ERROR.NO_TRANSLATIONS_TO_SAVE");
                 }
 
                 if (link) {
-                    let fileName = fileService().getFileName().split(".")[0];
                     let fileExt = fileService().getFileName().split(".")[1];
                     let jsonData = JSON.stringify(flat.unflatten(translations.dev), null, 4);
                     let textData = new Blob([jsonData], {type: "text/plain"});
@@ -207,6 +207,14 @@ export const translationsService = (function(){
                 }
             },
             saveExport: (link) => {
+                // error checking...
+                if (fileService().getFileName() === "FILE_NOT_FOUND") {
+                    if (event) {
+                        event.preventDefault();
+                    }
+                    return alertService().raise("ERROR.NO_TRANSLATIONS_TO_EXPORT");
+                }
+
                 if (link) {
                     let fileName = fileService().getFileName().split(".")[0];
                     let fileExt = fileService().getFileName().split(".")[1];

@@ -14,7 +14,7 @@ export const fileService = (function () {
                 if (file) {
                     return file.name;
                 }
-                return localStorageService().GetLocalStorage().getItem("JTE_FILENAME");
+                return localStorageService().GetLocalStorage().getItem("JTE_FILENAME") || "FILE_NOT_FOUND";
             }
         }
     }
