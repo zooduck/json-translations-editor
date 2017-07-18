@@ -7,25 +7,24 @@ import {localStorageService} from "./local_storage_service";
 import {paginationService} from "./pagination_service";
 import {fileService} from "./file_service";
 import {alertService} from "./alert_service";
+import {translationsTableService} from "./translations_table_service";
 
 export const translationsService = (function(){
 
     let importedFiles = [];
     let commonKeys = {}
-
     let translations = {
         export: {},
         import: {},
-        dev: {}
+        dev: {},
+        page: 1
     };
 
     const init = () => {
-
-        translations = {
-            export: {},
-            import: {},
-            dev: {}
-        }
+        translations.export = {}
+        translations.import = {}
+        translations.dev = {}
+        translations.page = 1
     };
 
     const getFiles = () => {
@@ -64,17 +63,7 @@ export const translationsService = (function(){
         }
     };
 
-    // const resetTranslationKey = (key) => {
-    //     if (key) {
-    //         translations.export[key] = translations.import[key];
-    //     }
-    //     updateTranslations();
-    // };
-
     const updateTranslations = (options = {type: ["export", "dev"]}) => {
-
-        // console.log("translations before update .export", translations);
-        // debugger
 
         // 1. update exports
         if (options.type.indexOf("export") !== -1) {
@@ -100,23 +89,21 @@ export const translationsService = (function(){
             }
         }
 
-        // console.log("translations before update .dev", translations);
-        // debugger
-
         // 2. update dev
         if (options.type.indexOf("dev") !== -1) {
             for (let key in translations.export) {
                 if (translations.import[key] != translations.export[key]) {
                     translations.dev[key] = translations.export[key]
                 } else {
-                    // console.log("deleting", key, "from translations.dev");
                     delete translations.dev[key];
                 }
             }
         }
 
-        // console.log("translations after update:", translations);
-        // debugger
+        // 3. update page
+        if (options.type.indexOf("page") !== -1) {
+            translations.page = paginationService().GetLastViewedPage();           
+        }
 
         localStorageService().setLocalStorage();
 
@@ -127,10 +114,10 @@ export const translationsService = (function(){
             SyncCommonKeyValues: (key, val) => {
                 return syncCommonKeyValues(key, val);
             },
-            UpdateTranslations: () => {
-                return updateTranslations();
+            UpdateTranslations: (options) => {               
+                return updateTranslations(options);
             },
-            setTranslations: (data, flattenData = false) => {
+            setTranslations: (data, flattenData = false) => {               
 
                 if (!data && localStorageService().GetLocalStorage().JTE_TRANSLATIONS) {
                     data = localStorageService().GetLocalStorage().JTE_TRANSLATIONS;
@@ -142,7 +129,6 @@ export const translationsService = (function(){
 
                     let dataObj = JSON.parse(data);
 
-
                     // ----------------------------------------------------------------------------------------------------------------
                     // NOTE: This is here only to allow deep objects like package.json to be imported (and not crash the application)
                     // ----------------------------------------------------------------------------------------------------------------
@@ -151,29 +137,35 @@ export const translationsService = (function(){
                     }
 
 
-
-                    if (dataObj.export) {
+                    if (dataObj.export) {                         
                          Object.assign(translations, dataObj);
                      } else {
                         Object.assign(translations["export"], dataObj);
                         Object.assign(translations["import"], dataObj);
                      }
-
-                    console.log("translations after setTranslations:", translations);
-
                 }
-
-                localStorageService().setLocalStorage();
-
             },
             resetTranslationKey: (key) => {
-                if (key) {
-                    //alert("export:"+translations.export[key]+" import:"+translations.import[key]);
+                if (key) {        
                     translations.export[key] = translations.import[key];
                     updateTranslations({type:["dev"]});
-                    //console.log("translations after resetTranslationKey", translations);
                     return translations.import[key];
                 }
+            },
+            resetTranslations: () => {
+                // reset translations...
+                translations.export = translations.import;
+                translations.dev = {}
+                // reset DOM...               
+                let rows = translationsTableService().GetRows();
+                for (let row of rows) {
+                    let enTD = row.children[1];
+                    let textarea = row.children[2].querySelector("textarea");
+                    enTD.querySelector("span").classList.remove("line-through");
+                    textarea.value = "";
+                }
+                // update localStorage...           
+                localStorageService().setLocalStorage();
             },
             getTranslations: () => {
                 return translations;
@@ -182,8 +174,6 @@ export const translationsService = (function(){
                 commonKeys[key] = val;
             },
             saveDev: (link) => {
-                console.log("saveDev() translations:", translations);
-
                 if (Object.keys(translations.dev).length < 1) {
                     event.preventDefault();
                     return alertService().raise("ERROR.NO_TRANSLATIONS_TO_SAVE");
@@ -205,14 +195,7 @@ export const translationsService = (function(){
                 if (link) {
                     let fileName = fileService().getFileName().split(".")[0];
                     let fileExt = fileService().getFileName().split(".")[1];
-                    // let jsonData = JSON.stringify(translations.export, null, 4);
-                    // jsonData += JSON.stringify(translations.import, null, 4);
-
                     let jsonData = JSON.stringify(translations, null, 4);
-
-
-
-
                     let textData = new Blob([jsonData], {type: "text/plain"});
                     let file = window.URL.createObjectURL(textData);
                     link.download = `${fileName}_WORK_IN_PROGRESS_${getDateTimeSuffix()}.${fileExt}`;

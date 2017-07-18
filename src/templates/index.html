@@ -52,11 +52,11 @@
                     <i class="ion-md-add"></i>
                 </label>
                 <!-- download JSON translations for developers -->
-                <a id="devTranslationsCtrl" download="" href="" title="Download translations">
+                <a id="devTranslationsCtrl" download="" href="#" title="Download translations">
                     <i class="ion-md-cloud-download"></i>
                 </a>
                 <!-- save progress -->
-                <a id="exportTranslationsCtrl" download="" href="" title="Save Progress (export to file)">
+                <a id="exportTranslationsCtrl" download="" href="#" title="Save Progress (export to file)">
                     <i class="fa fa-save"></i>
                 </a>    
                             
@@ -78,7 +78,12 @@
             <div id="translationsTable">
                  <div class="container-flex break table-headers">
                     <div class="th">KEY</div>
-                    <div class="th">EN</div>
+                    <div class="th">
+                        <span>EN</span>
+                        <div class="reset-all" id="resetAllCtrl">
+                            <button>RESET ALL</button>
+                        </div>
+                    </div>
                     <div class="th">TRANSLATION</div>
                 </div>
                 <div class="table-rows"></div>
@@ -94,7 +99,7 @@
                     <div class="reset-value"><button>RESET</button></div>
                 </div>
                 <div class="td pop-in trans">
-                     <textarea rows="1" placeholder="..."></textarea>    
+                     <textarea rows="1" placeholder="..." tabindex="1"></textarea>    
                 </div>
             </div>
 

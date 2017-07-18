@@ -1,6 +1,7 @@
 // DOM...
 import {file_name} from "./dom_service";
 // Services...
+import {paginationService} from "./pagination_service";
 import {translationsService} from "./translations_service";
 import {translationsTableService} from "./translations_table_service";
 import {loadingService} from "./loading_service";
@@ -21,7 +22,9 @@ export const localStorageService = (function () {
                 let translations = translationsService().getTranslations();
                 localStorage[`${prefix}TRANSLATIONS`] = JSON.stringify(translations);
                 
+                console.log("translations", translations);
                 console.log("setLocalStorage:", localStorage);
+
             },
             setLocalStorageItem: (item, val) => {
                 localStorage.setItem(item, val);
@@ -34,7 +37,7 @@ export const localStorageService = (function () {
             //     //return getLocalStorage()["JTE_TRANSLATIONS"];
             // },
             clear: () => {                
-                let items = [`${prefix}TRANSLATIONS`, `${prefix}FILENAME`];
+                let items = [`${prefix}TRANSLATIONS`, `${prefix}FILENAME`, `${prefix}PAGE`];
                 for (let item of items) {
                     localStorage.removeItem(item);
                 }
@@ -59,18 +62,21 @@ export const localStorageService = (function () {
 		                let translations = JSON.parse(getLocalStorage().JTE_TRANSLATIONS);
 		                let data = translations;
 		                let fileName = getLocalStorage().JTE_FILENAME;
+                        let page = getLocalStorage().JTE_PAGE;
 
 
 		                file_name.innerHTML = `${fileName} [from cache]`;
 
 		                malenkyFileService().build(data, fileName);
 
+                        paginationService().SetLastViewedPage(page);
+
 		                translationsService().setTranslations();
 		                translationsTableService().init(data);              
 
 		                let interval = setInterval(function(){
 		                    if (loadingService().isLoading()) {
-		                        translationsTableService().build(data);
+		                        translationsTableService().build(data, page);
 		                        clearInterval(interval);
 		                    }
 		                }, 10);

@@ -6,15 +6,11 @@ export const fileService = (function () {
        return {
             setFile(data) {
                 file = data;
-                console.log("file", file);
             },
             getFile() {
-                console.log("file", file);
                 return file;
             },
             getFileName() {
-                // console.log("file", file);
-                // console.log("localStorage", localStorage);
                 if (file) {
                     return file.name;
                 }

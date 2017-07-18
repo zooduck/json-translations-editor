@@ -1,5 +1,5 @@
 // DOM...
-import {export_translations_ctrl, dev_translations_ctrl, file_input, search_table, pagination_ctrls} from "./services/dom_service";
+import {export_translations_ctrl, dev_translations_ctrl, file_input, search_table, pagination_ctrls, reset_all_ctrl} from "./services/dom_service";
 // Services...
 import {localStorageService} from "./services/local_storage_service";
 import {translationsService} from "./services/translations_service";
@@ -19,17 +19,22 @@ export_translations_ctrl.addEventListener("click", function () {
 
 file_input.addEventListener("change", fileHandlerService);
 
-search_table.addEventListener("keyup", function () {
-	translationsTableService().filter(this.value);
-	translationsTableService().filterAll(this.value);
+search_table.addEventListener("keyup", function (e) {	
+	translationsTableService().filter(e, this.value);
 });
 
-pagination_ctrls.querySelectorAll("i")[0].addEventListener("click", function () {
+pagination_ctrls.querySelectorAll("i")[0].addEventListener("click", function (e) {
+	e.preventDefault();
 	paginationService().loadPreviousPage();
 });
 
-pagination_ctrls.querySelectorAll("i")[1].addEventListener("click", function () {
+pagination_ctrls.querySelectorAll("i")[1].addEventListener("click", function (e) {
+	e.preventDefault();
 	paginationService().loadNextPage();
+});
+
+reset_all_ctrl.addEventListener("click", function (e) {
+	translationsService().resetTranslations();
 });
 // Initialisation
 localStorageService().init();

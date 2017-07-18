@@ -10,7 +10,9 @@ import {localStorageService} from "./local_storage_service";
 import {alertService} from "./alert_service";
 import {malenkyFileService} from "./malenky_file_service";
 
-export const fileHandlerService = function (e) {   
+export const fileHandlerService = function (e) {
+
+    e.preventDefault();  
 
     loadingService().setLoading();
 
@@ -20,6 +22,7 @@ export const fileHandlerService = function (e) {
         let reader = new FileReader();
         
         reader.onload = (e) => {
+ 
             let textData = e.target.result;
             let exportedTextData = e.target.result;
             let importedTextData = e.target.result;
@@ -33,23 +36,18 @@ export const fileHandlerService = function (e) {
                 file_name.innerHTML = fileService().getFile().name;
 
                 translationsService().pushFile(file);
-                translationsService().setTranslations(textData, true);
-                
-                // console.log(translationsService().getTranslations());               
+                translationsService().setTranslations(textData, true);          
 
                 translationsTableService().init(textData);
 
                 localStorageService().clear();
                 localStorageService().setLocalStorage();
                 localStorageService().setLocalStorageItem("JTE_FILENAME", file.name);
-
-                // console.log("localStorage (after file import):", localStorage);
                 
                 malenkyFileService().build(translationsService().getTranslations().export, file.name);
 
                 let interval = setInterval(function(){
-                if (loadingService().isLoading()) {
-                        // console.log(translationsService().getTranslations());                       
+                if (loadingService().isLoading()) {                     
                         translationsTableService().build(translationsService().getTranslations());
                         clearInterval(interval);
                     }

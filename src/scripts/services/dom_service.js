@@ -16,3 +16,4 @@ export const alert_confirm_ctrl_cancel = document.getElementById("alertConfirmCt
 export const alert_confirm_ctrl_ok = document.getElementById("alertConfirmCtrlOK");
 export const search_table = document.getElementById("searchTable");
 export const file_input = document.getElementById("file");
+export const reset_all_ctrl = document.getElementById("resetAllCtrl");
