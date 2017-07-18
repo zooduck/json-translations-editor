@@ -100,7 +100,11 @@ button {
 	background: cornflowerblue;
 	color: #fff;
 	font-size: 1.5em;
+	user-select: none;
 
+	&:hover {
+		background: lighten(cornflowerblue, 10%);
+	}
 
 	&:active {
 		outline: none;
@@ -289,6 +293,7 @@ $delays: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;
 
 	.table-headers {
 		margin-right: 22px;
+		padding-bottom: 10px;
 
 		.th {
 			flex-grow: 1;
